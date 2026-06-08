@@ -50,8 +50,7 @@ export async function PUT(req: NextRequest) {
 
 // POST: Add a new player (+ optional account)
 export async function POST(req: NextRequest) {
-  const supabase = await createClient()
-  const admin = await requireAdmin(supabase)
+  const admin = await requireAdmin()
   if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { displayName, username, birthdate, createAccount, password, role } = await req.json()
@@ -116,8 +115,7 @@ export async function POST(req: NextRequest) {
 
 // DELETE demo players (username starts with demo_)
 export async function DELETE(req: NextRequest) {
-  const supabase = await createClient()
-  const admin = await requireAdmin(supabase)
+  const admin = await requireAdmin()
   if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()
@@ -184,8 +182,7 @@ export async function DELETE(req: NextRequest) {
 
 // PATCH: Toggle player active status or update player
 export async function PATCH(req: NextRequest) {
-  const supabase = await createClient()
-  const admin = await requireAdmin(supabase)
+  const admin = await requireAdmin()
   if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { playerId, isActive, displayName, birthdate } = await req.json()
