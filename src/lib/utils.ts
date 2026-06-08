@@ -1,18 +1,12 @@
 export function formatScore(score: number): string {
-  if (score >= 1_000_000) return (score / 1_000_000).toFixed(2) + 'M'
-  if (score >= 1_000) return (score / 1_000).toFixed(0) + 'K'
-  return score.toString()
+  if (!score) return ''
+  return score.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
 }
 
 export function parseScoreInput(input: string): number {
-  const clean = input.replace(/\s/g, '').replace(',', '.')
-  if (clean.toLowerCase().endsWith('m')) {
-    return Math.round(parseFloat(clean) * 1_000_000)
-  }
-  if (clean.toLowerCase().endsWith('k')) {
-    return Math.round(parseFloat(clean) * 1_000)
-  }
-  return parseInt(clean, 10) || 0
+  const clean = input.replace(/\s/g, '')
+  const val = parseInt(clean, 10)
+  return isNaN(val) ? 0 : val
 }
 
 export function formatDate(dateStr: string, locale: 'fr' | 'en' = 'fr'): string {
@@ -61,7 +55,7 @@ export const TRANSLATIONS = {
     player: 'Joueur',
     baseScore: 'Base',
     dailyPts: 'Points / Jour',
-    contribPts: 'Contrib.',
+    contribPts: 'Dim.',
     sanctionPts: 'Sanctions',
     total: 'Total',
     role: 'Rôle',
@@ -126,7 +120,7 @@ export const TRANSLATIONS = {
     player: 'Player',
     baseScore: 'Base',
     dailyPts: 'Daily Pts',
-    contribPts: 'Contrib.',
+    contribPts: 'Sun.',
     sanctionPts: 'Sanctions',
     total: 'Total',
     role: 'Role',

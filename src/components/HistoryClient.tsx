@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { TRANSLATIONS, Lang, getRankColor } from '@/lib/utils'
 import type { Profile, Week, Player, WeeklyRanking } from '@/types'
 
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export default function HistoryClient({ profile, weeks, players, rankings }: Props) {
+  const router = useRouter()
   const [lang, setLang] = useState<Lang>('fr')
   const [selectedWeekId, setSelectedWeekId] = useState<string>(weeks[0]?.id || '')
   const t = TRANSLATIONS[lang]
@@ -46,6 +48,12 @@ export default function HistoryClient({ profile, weeks, players, rankings }: Pro
       </nav>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="mb-4">
+          <button onClick={() => router.back()} className="btn-secondary text-sm">
+            ← {lang === 'fr' ? 'Retour' : 'Back'}
+          </button>
+        </div>
+
         <h1 className="text-2xl font-bold text-white mb-6">📚 {t.weekHistory}</h1>
 
         {weeks.length === 0 ? (
@@ -54,39 +62,27 @@ export default function HistoryClient({ profile, weeks, players, rankings }: Pro
             <p className="text-slate-400">{t.noHistory}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Week selector */}
-            <div className="card p-4">
-              <p className="text-slate-400 text-xs font-medium mb-3 uppercase tracking-wider">
-                {lang === 'fr' ? 'Semaines' : 'Weeks'}
-              </p>
-              <div className="space-y-1">
+          <div className="space-y-4">
+            {/* Week dropdown */}
+            <div className="flex items-center gap-3">
+              <label className="text-slate-400 text-sm whitespace-nowrap">
+                {lang === 'fr' ? 'Semaine :' : 'Week:'}
+              </label>
+              <select
+                value={selectedWeekId}
+                onChange={e => setSelectedWeekId(e.target.value)}
+                className="input-field max-w-xs"
+              >
                 {weeks.map(w => (
-                  <button
-                    key={w.id}
-                    onClick={() => setSelectedWeekId(w.id)}
-                    className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-all ${
-                      selectedWeekId === w.id
-                        ? 'bg-amber-400/10 border border-amber-400/30 text-amber-400'
-                        : 'text-slate-300 hover:bg-slate-700/50'
-                    }`}
-                  >
-                    <div className="font-medium">{t.weekNumber} {w.week_number}</div>
-                    <div className="text-xs opacity-70">
-                      {new Date(w.start_date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US', { day: '2-digit', month: 'short' })}
-                      {' → '}
-                      {new Date(w.end_date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US', { day: '2-digit', month: 'short' })}
-                    </div>
-                    <div className={`text-xs mt-0.5 ${w.type === 'push' ? 'text-amber-500' : 'text-emerald-500'}`}>
-                      {w.type === 'push' ? t.pushWeek : t.ecoWeek}
-                    </div>
-                  </button>
+                  <option key={w.id} value={w.id}>
+                    S{w.week_number} · {new Date(w.start_date + 'T00:00:00Z').toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US', { day: '2-digit', month: 'short' })} → {new Date(w.end_date + 'T00:00:00Z').toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US', { day: '2-digit', month: 'short' })} · {w.type === 'push' ? (lang === 'fr' ? 'Push' : 'Push') : 'Éco'}
+                  </option>
                 ))}
-              </div>
+              </select>
             </div>
 
             {/* Rankings table */}
-            <div className="lg:col-span-3 card overflow-hidden">
+            <div className="card overflow-hidden">
               {selectedWeek && (
                 <div className="px-4 py-3 border-b border-slate-700 flex items-center gap-3">
                   <h2 className="text-white font-semibold">

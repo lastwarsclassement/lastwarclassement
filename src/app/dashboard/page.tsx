@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import DashboardClient from '@/components/DashboardClient'
 
+export const dynamic = 'force-dynamic'
+
 export default async function DashboardPage() {
   const supabase = await createClient()
 
@@ -19,20 +21,17 @@ export default async function DashboardPage() {
   ])
 
   let dailyScores = null
-  let contributions = null
   let sanctions = null
   let baseScores = null
   let weekRankings = null
 
   if (activeWeek) {
-    const [ds, wc, s, pwb] = await Promise.all([
+    const [ds, s, pwb] = await Promise.all([
       supabase.from('daily_scores').select('*').eq('week_id', activeWeek.id),
-      supabase.from('weekly_contributions').select('*').eq('week_id', activeWeek.id),
       supabase.from('sanctions').select('*').eq('week_id', activeWeek.id),
       supabase.from('player_week_base').select('*').eq('week_id', activeWeek.id),
     ])
     dailyScores = ds.data
-    contributions = wc.data
     sanctions = s.data
     baseScores = pwb.data
 
@@ -53,7 +52,6 @@ export default async function DashboardPage() {
       players={players || []}
       activeWeek={activeWeek}
       dailyScores={dailyScores || []}
-      contributions={contributions || []}
       sanctions={sanctions || []}
       baseScores={baseScores || []}
       weekRankings={weekRankings || []}

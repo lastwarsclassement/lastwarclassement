@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { TRANSLATIONS, Lang } from '@/lib/utils'
-import { getBirthdaysInRange } from '@/lib/scoring'
+import { getBirthdaysInRange, getNextBirthdayDate } from '@/lib/scoring'
 import type { Player, Week, PlayerRole } from '@/types'
 
 interface PlayerRow {
@@ -27,17 +27,14 @@ export default function WeekValidationModal({ players, week, rows, lang, onClose
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
-  // Compute next week's date range
+  // Compute next week's date range (UTC)
   const nextWeekStart = useMemo(() => {
-    const d = new Date(week.end_date)
-    d.setDate(d.getDate() + 1)
-    return d
+    const d = new Date(week.end_date + 'T00:00:00Z')
+    return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + 1))
   }, [week])
 
   const nextWeekEnd = useMemo(() => {
-    const d = new Date(nextWeekStart)
-    d.setDate(d.getDate() + 6)
-    return d
+    return new Date(Date.UTC(nextWeekStart.getUTCFullYear(), nextWeekStart.getUTCMonth(), nextWeekStart.getUTCDate() + 6))
   }, [nextWeekStart])
 
   const birthdayPlayerIds = useMemo(() =>
@@ -121,7 +118,7 @@ export default function WeekValidationModal({ players, week, rows, lang, onClose
       rank: row.rank,
       total_points: row.totalPoints,
       role: getRole(row.player.id),
-      base_score_next_week: Math.max(0, row.totalPoints + getScoreDeduction(row.player.id)),
+      base_score_next_week: row.totalPoints + getScoreDeduction(row.player.id),
     }))
 
     const res = await fetch('/api/admin/validate-week', {
@@ -159,7 +156,12 @@ export default function WeekValidationModal({ players, week, rows, lang, onClose
               🎂 {birthdayPlayers.length} {t.birthdayNote}
             </p>
             <p className="text-pink-400 text-xs">
-              {birthdayPlayers.map(p => p.display_name).join(', ')}
+              {birthdayPlayers.map(p => {
+                const bd = getNextBirthdayDate(p.birth_date, nextWeekStart)
+                const day = String(bd.getUTCDate()).padStart(2, '0')
+                const month = String(bd.getUTCMonth() + 1).padStart(2, '0')
+                return `${p.display_name} (${day}/${month})`
+              }).join(', ')}
             </p>
             <p className="text-slate-400 text-xs mt-1">
               {lang === 'fr'
@@ -213,7 +215,7 @@ export default function WeekValidationModal({ players, week, rows, lang, onClose
             {rows.slice(0, 15).map(row => {
               const role = getRole(row.player.id)
               const deduction = getScoreDeduction(row.player.id)
-              const nextBase = Math.max(0, row.totalPoints + deduction)
+              const nextBase = row.totalPoints + deduction
               return (
                 <div key={row.player.id} className="flex items-center gap-2 text-xs px-2 py-1.5 rounded bg-slate-800/50">
                   <span className="text-slate-500 w-5 text-right">{row.rank}</span>

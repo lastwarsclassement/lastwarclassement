@@ -10,7 +10,6 @@ export default function LoginPage() {
   const [lang, setLang] = useState<'fr' | 'en'>('fr')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [birthdate, setBirthdate] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -21,28 +20,22 @@ export default function LoginPage() {
       subtitle: 'Classement Alliance',
       username: 'Pseudo',
       password: 'Mot de passe',
-      birthdate: 'Date de naissance',
       login: 'Se connecter',
       loading: 'Connexion...',
       show: 'Afficher',
       hide: 'Masquer',
       errorInvalid: 'Pseudo ou mot de passe incorrect',
-      errorBirthdate: 'Date de naissance incorrecte',
-      note: 'Pour les lecteurs : renseignez votre date de naissance',
     },
     en: {
       title: 'Last War',
       subtitle: 'Alliance Leaderboard',
       username: 'Username',
       password: 'Password',
-      birthdate: 'Birthday',
       login: 'Login',
       loading: 'Signing in...',
       show: 'Show',
       hide: 'Hide',
       errorInvalid: 'Invalid username or password',
-      errorBirthdate: 'Incorrect birth date',
-      note: 'Readers: please enter your birth date',
     },
   }[lang]
 
@@ -60,36 +53,6 @@ export default function LoginPage() {
       setError(t.errorInvalid)
       setLoading(false)
       return
-    }
-
-    // Fetch profile to check role and birth_date
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role, player_id')
-      .eq('id', data.user.id)
-      .single()
-
-    if (profile?.role === 'reader' && profile.player_id) {
-      const { data: player } = await supabase
-        .from('players')
-        .select('birth_date')
-        .eq('id', profile.player_id)
-        .single()
-
-      if (player && birthdate) {
-        const expected = player.birth_date // format: YYYY-MM-DD
-        if (birthdate !== expected) {
-          await supabase.auth.signOut()
-          setError(t.errorBirthdate)
-          setLoading(false)
-          return
-        }
-      } else if (!birthdate) {
-        await supabase.auth.signOut()
-        setError(t.errorBirthdate)
-        setLoading(false)
-        return
-      }
     }
 
     router.push('/dashboard')
@@ -153,19 +116,6 @@ export default function LoginPage() {
                   {showPassword ? t.hide : t.show}
                 </button>
               </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">
-                {t.birthdate} <span className="text-slate-500 text-xs">({t.note})</span>
-              </label>
-              <input
-                className="input-field"
-                type="date"
-                value={birthdate}
-                onChange={e => setBirthdate(e.target.value)}
-                style={{ colorScheme: 'dark' }}
-              />
             </div>
 
             {error && (

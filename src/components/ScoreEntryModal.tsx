@@ -17,17 +17,32 @@ interface Props {
 export default function ScoreEntryModal({ players, week, existingScores, lang, onClose, onSaved }: Props) {
   const t = TRANSLATIONS[lang]
 
-  const today = new Date().toISOString().split('T')[0]
-  const [selectedDate, setSelectedDate] = useState(today)
+  // Only allow dates within the current week (UTC)
+  const start = new Date(week.start_date + 'T00:00:00Z')
+  const weekDaysEarly: string[] = Array.from({ length: 7 }, (_, i) =>
+    new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate() + i))
+      .toISOString().split('T')[0]
+  )
+
+  const todayUTC = new Date().toISOString().split('T')[0]
+  // Clamp default date to the week's range
+  const defaultDate = weekDaysEarly.includes(todayUTC)
+    ? todayUTC
+    : (todayUTC < weekDaysEarly[0] ? weekDaysEarly[0] : weekDaysEarly[5])
+
+  const [selectedDate, setSelectedDate] = useState(defaultDate)
   const [scores, setScores] = useState<Record<string, string>>(() => {
     const map: Record<string, string> = {}
     players.forEach(p => {
       const existing = existingScores.find(
-        s => s.player_id === p.id && s.score_date === today
+        s => s.player_id === p.id && s.score_date === defaultDate
       )
-      map[p.id] = existing
-        ? (isSunday(today) ? existing.contribution_score?.toString() : existing.vs_score?.toString()) ?? ''
-        : ''
+      if (existing) {
+        const raw = isSunday(defaultDate) ? existing.contribution_score : existing.vs_score
+        map[p.id] = raw != null ? formatScore(raw) : ''
+      } else {
+        map[p.id] = ''
+      }
     })
     return map
   })
@@ -42,9 +57,12 @@ export default function ScoreEntryModal({ players, week, existingScores, lang, o
     const isSun = isSunday(date)
     players.forEach(p => {
       const existing = existingScores.find(s => s.player_id === p.id && s.score_date === date)
-      newScores[p.id] = existing
-        ? (isSun ? existing.contribution_score?.toString() : existing.vs_score?.toString()) ?? ''
-        : ''
+      if (existing) {
+        const raw = isSun ? existing.contribution_score : existing.vs_score
+        newScores[p.id] = raw != null ? formatScore(raw) : ''
+      } else {
+        newScores[p.id] = ''
+      }
     })
     setScores(newScores)
   }
@@ -80,21 +98,14 @@ export default function ScoreEntryModal({ players, week, existingScores, lang, o
     onSaved()
   }
 
-  // Only allow dates within the current week
-  const weekDays: string[] = []
-  const start = new Date(week.start_date)
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(start)
-    d.setDate(start.getDate() + i)
-    weekDays.push(d.toISOString().split('T')[0])
-  }
+  const weekDays = weekDaysEarly
 
   const dayNames: Record<number, string> = lang === 'fr'
     ? { 1: 'Lun', 2: 'Mar', 3: 'Mer', 4: 'Jeu', 5: 'Ven', 6: 'Sam', 7: 'Dim' }
     : { 1: 'Mon', 2: 'Tue', 3: 'Wed', 4: 'Thu', 5: 'Fri', 6: 'Sat', 7: 'Sun' }
 
   function getDow(d: string) {
-    const day = new Date(d).getDay()
+    const day = new Date(d + 'T00:00:00Z').getUTCDay()
     return day === 0 ? 7 : day
   }
 
@@ -145,33 +156,25 @@ export default function ScoreEntryModal({ players, week, existingScores, lang, o
         </p>
 
         <p className="text-xs text-slate-500 mb-4">
-          {lang === 'fr' ? 'Formats acceptés: 7200000, 7.2M, 7200K' : 'Accepted formats: 7200000, 7.2M, 7200K'}
+          {lang === 'fr' ? 'Format : 7 200 000' : 'Format: 7 200 000'}
         </p>
 
         {/* Score inputs */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-96 overflow-y-auto pr-1">
-          {players.map((player, i) => {
+          {[...players].sort((a, b) => (a.display_name ?? '').localeCompare(b.display_name ?? '')).map((player) => {
             const val = scores[player.id] || ''
-            const parsed = parseScoreInput(val)
-            const hasValue = val !== '' && parsed > 0
 
             return (
               <div key={player.id} className="flex items-center gap-2 bg-slate-800/50 rounded-lg px-3 py-2">
-                <span className="text-slate-500 text-xs w-5 text-right">{i + 1}</span>
-                <span className="text-slate-200 text-sm flex-1 truncate">{player.display_name}</span>
-                <div className="relative">
+                <span className="text-slate-200 text-sm flex-1 min-w-0 truncate">{player.display_name}</span>
+                <div className="flex-shrink-0 w-32">
                   <input
                     type="text"
-                    className="input-field w-28 text-right"
-                    placeholder={sunday ? '0' : '7.2M'}
+                    className="input-field text-right"
+                    placeholder={sunday ? '0' : '7 200 000'}
                     value={val}
                     onChange={e => setScores(prev => ({ ...prev, [player.id]: e.target.value }))}
                   />
-                  {hasValue && (
-                    <span className="absolute -top-1 -right-1 text-xs text-amber-400">
-                      {formatScore(parsed)}
-                    </span>
-                  )}
                 </div>
               </div>
             )
