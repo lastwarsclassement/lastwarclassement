@@ -214,11 +214,11 @@ export default function DashboardClient({
   return (
     <div className="min-h-screen">
       {/* Navbar */}
-      <nav className="sticky top-0 z-40 border-b border-slate-700/50 bg-slate-900/90 backdrop-blur-sm">
+      <nav className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-sm" style={{ borderBottom: '1px solid #2A3550' }}>
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg gold-gradient flex items-center justify-center text-sm">⚔️</div>
-            <span className="font-bold text-white text-lg hidden sm:block">{t.title}</span>
+            <div className="w-9 h-9 rounded-lg gold-gradient flex items-center justify-center text-base shadow-lg" style={{ boxShadow: '0 0 12px rgba(245,166,35,0.5)' }}>⚔️</div>
+            <span className="font-display font-bold text-lg hidden sm:block uppercase tracking-widest gold-glow" style={{ color: 'var(--gold)' }}>Classement Last War</span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -266,7 +266,7 @@ export default function DashboardClient({
           {/* Title + week type */}
           <div className="flex flex-wrap gap-3 items-start justify-between mb-3">
             <div>
-              <h1 className="text-2xl font-bold text-white">{t.dashboard}</h1>
+              <h1 className="font-display text-2xl font-bold uppercase tracking-wide gold-glow" style={{ color: 'var(--gold)' }}>🏆 {t.dashboard}</h1>
               {activeWeek ? (
                 <>
                   <p className={`text-xl font-bold mt-1 ${activeWeek.type === 'push' ? 'text-amber-400' : 'text-emerald-400'}`}>
@@ -286,12 +286,6 @@ export default function DashboardClient({
               )}
             </div>
 
-            {/* Start week button (no active week) */}
-            {isAdmin && !activeWeek && (
-              <button onClick={handleStartWeek} className="btn-primary text-sm" disabled={startingWeek}>
-                {startingWeek ? t.loading : `▶ ${t.startWeek}`}
-              </button>
-            )}
           </div>
 
           {/* Admin action buttons */}
@@ -355,11 +349,21 @@ export default function DashboardClient({
           </div>
         )}
 
-        {/* No active week + not admin */}
-        {!activeWeek && !isAdmin && (
-          <div className="card p-12 text-center">
-            <div className="text-5xl mb-4">⚔️</div>
-            <p className="text-slate-400">{t.noActiveWeek}</p>
+        {/* No active week */}
+        {!activeWeek && (
+          <div className="card p-16 text-center" style={{ background: 'radial-gradient(ellipse at center, rgba(245,166,35,0.05) 0%, var(--bg-surface) 70%)' }}>
+            <div className="text-7xl mb-6">🏆</div>
+            <h2 className="font-display text-2xl font-bold uppercase tracking-wide mb-2" style={{ color: 'var(--text-secondary)' }}>
+              {lang === 'fr' ? 'Aucune semaine en cours' : 'No active week'}
+            </h2>
+            <p className="mb-8" style={{ color: 'var(--text-muted)' }}>
+              {lang === 'fr' ? 'Démarrez une nouvelle semaine pour voir le classement' : 'Start a new week to display the leaderboard'}
+            </p>
+            {isAdmin && (
+              <button onClick={handleStartWeek} className="btn-primary text-base px-8 py-3" disabled={startingWeek}>
+                {startingWeek ? t.loading : `▶ ${t.startWeek}`}
+              </button>
+            )}
           </div>
         )}
 
@@ -369,17 +373,15 @@ export default function DashboardClient({
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-700">
-                    <th className="text-left px-4 py-3 text-slate-400 font-medium w-12">{t.rank}</th>
-                    <th className="text-left px-4 py-3 text-slate-400 font-medium">{t.player}</th>
+                  <tr>
+                    <th className="table-th w-12">{t.rank}</th>
+                    <th className="table-th">{t.player}</th>
                     {weekDays.map((_, i) => (
-                      <th key={i} className="text-center px-2 py-3 text-slate-400 font-medium w-12">
-                        {dayLabels[i]}
-                      </th>
+                      <th key={i} className="table-th-center w-12">{dayLabels[i]}</th>
                     ))}
-                    <th className="text-center px-2 py-3 text-slate-400 font-medium">{t.contribPts}</th>
-                    <th className="text-center px-2 py-3 text-slate-400 font-medium">{t.sanctionPts}</th>
-                    <th className="text-center px-4 py-3 text-white font-semibold">{t.total}</th>
+                    <th className="table-th-center">{t.contribPts}</th>
+                    <th className="table-th-center">{t.sanctionPts}</th>
+                    <th className="table-th-center" style={{ color: 'var(--gold)' }}>{t.total}</th>
                   </tr>
                 </thead>
                 <tbody>

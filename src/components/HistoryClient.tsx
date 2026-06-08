@@ -24,11 +24,11 @@ export default function HistoryClient({ profile, weeks, players, rankings }: Pro
   return (
     <div className="min-h-screen">
       {/* Navbar */}
-      <nav className="sticky top-0 z-40 border-b border-slate-700/50 bg-slate-900/90 backdrop-blur-sm">
+      <nav className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-sm" style={{ borderBottom: '1px solid #2A3550' }}>
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg gold-gradient flex items-center justify-center text-sm">⚔️</div>
-            <span className="font-bold text-white text-lg hidden sm:block">{t.title}</span>
+            <div className="w-9 h-9 rounded-lg gold-gradient flex items-center justify-center text-base" style={{ boxShadow: '0 0 12px rgba(245,166,35,0.5)' }}>⚔️</div>
+            <span className="font-display font-bold text-lg hidden sm:block uppercase tracking-widest gold-glow" style={{ color: 'var(--gold)' }}>Classement Last War</span>
           </div>
           <div className="flex items-center gap-2">
             <a href="/dashboard" className="text-sm text-slate-300 hover:text-amber-400 px-3 py-1 transition-colors">
@@ -54,7 +54,7 @@ export default function HistoryClient({ profile, weeks, players, rankings }: Pro
           </button>
         </div>
 
-        <h1 className="text-2xl font-bold text-white mb-6">📚 {t.weekHistory}</h1>
+        <h1 className="font-display text-2xl font-bold uppercase tracking-wide mb-6 gold-glow" style={{ color: 'var(--gold)' }}>📚 {t.weekHistory}</h1>
 
         {weeks.length === 0 ? (
           <div className="card p-12 text-center">
@@ -100,12 +100,12 @@ export default function HistoryClient({ profile, weeks, players, rankings }: Pro
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-slate-700">
-                      <th className="text-left px-4 py-3 text-slate-400 font-medium w-12">{t.rank}</th>
-                      <th className="text-left px-4 py-3 text-slate-400 font-medium">{t.player}</th>
-                      <th className="text-center px-4 py-3 text-slate-400 font-medium">{t.total}</th>
-                      <th className="text-center px-4 py-3 text-slate-400 font-medium">{lang === 'fr' ? 'Base suiv.' : 'Next base'}</th>
-                      <th className="text-center px-4 py-3 text-slate-400 font-medium">{t.role}</th>
+                    <tr>
+                      <th className="table-th w-12">{t.rank}</th>
+                      <th className="table-th">{t.player}</th>
+                      <th className="table-th-center" style={{ color: 'var(--gold)' }}>{t.total}</th>
+                      <th className="table-th-center">{lang === 'fr' ? 'Base suiv.' : 'Next base'}</th>
+                      <th className="table-th-center">{t.role}</th>
                     </tr>
                   </thead>
                   <tbody>
