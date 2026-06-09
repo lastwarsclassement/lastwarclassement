@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { TRANSLATIONS, Lang, LANG_CYCLE, LANG_LABELS } from '@/lib/utils'
@@ -16,6 +17,7 @@ interface NavbarProps {
 export default function Navbar({ lang, setLang, isAdmin, playerName, onProfile }: NavbarProps) {
   const router = useRouter()
   const t = TRANSLATIONS[lang]
+  const [langOpen, setLangOpen] = useState(false)
 
   async function handleLogout() {
     const supabase = createClient()
@@ -66,18 +68,42 @@ export default function Navbar({ lang, setLang, isAdmin, playerName, onProfile }
               {t.history}
             </a>
 
-            {/* Lang cycle */}
-            <button
-              onClick={() => {
-                const idx = LANG_CYCLE.indexOf(lang)
-                setLang(LANG_CYCLE[(idx + 1) % LANG_CYCLE.length])
-              }}
-              className="text-xs hover:text-yellow-400 rounded-full px-2 py-1 transition-colors"
-              style={{ color: '#A8C4E8', border: '1px solid #2A4F8A', minWidth: '34px' }}
-              title="Changer de langue / Change language"
-            >
-              {LANG_LABELS[lang]}
-            </button>
+            {/* Lang dropdown */}
+            <div style={{ position: 'relative' }}>
+              <button
+                onClick={() => setLangOpen(o => !o)}
+                onBlur={() => setTimeout(() => setLangOpen(false), 150)}
+                className="text-xs hover:text-yellow-400 rounded-full px-2 py-1 transition-colors flex items-center gap-1"
+                style={{ color: '#A8C4E8', border: '1px solid #2A4F8A', minWidth: '44px' }}
+              >
+                {LANG_LABELS[lang]} <span style={{ fontSize: '0.6rem' }}>▾</span>
+              </button>
+              {langOpen && (
+                <div style={{
+                  position: 'absolute', top: '110%', right: 0, zIndex: 9999,
+                  background: '#0F2548', border: '1px solid #2A4F8A', borderRadius: '8px',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.5)', overflow: 'hidden', minWidth: '64px',
+                }}>
+                  {LANG_CYCLE.map(l => (
+                    <button
+                      key={l}
+                      onClick={() => { setLang(l); setLangOpen(false) }}
+                      style={{
+                        display: 'block', width: '100%', padding: '7px 14px',
+                        textAlign: 'left', fontSize: '0.75rem', fontWeight: 700,
+                        color: l === lang ? '#FFB800' : '#A8C4E8',
+                        background: l === lang ? 'rgba(255,184,0,0.08)' : 'transparent',
+                        cursor: 'pointer', border: 'none',
+                      }}
+                      onMouseEnter={e => { if (l !== lang) (e.currentTarget as HTMLButtonElement).style.background = 'rgba(74,126,196,0.15)' }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = l === lang ? 'rgba(255,184,0,0.08)' : 'transparent' }}
+                    >
+                      {LANG_LABELS[l]}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {/* Tutorial button */}
             <button
