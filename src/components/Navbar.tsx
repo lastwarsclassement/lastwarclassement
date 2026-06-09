@@ -44,7 +44,7 @@ export default function Navbar({ lang, setLang, isAdmin, playerName, onProfile }
           {/* Logo */}
           <div className="flex items-center gap-3">
             <span className="text-2xl">⚔️</span>
-            <div className="hidden sm:flex flex-col leading-tight">
+            <div className="flex flex-col leading-tight">
               <span className="logo-text text-lg">Classement Last War</span>
               <span style={{ fontFamily: 'var(--font-body), Nunito, sans-serif', fontSize: '0.7rem', color: '#5B7FA8', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Alliance 3NOV</span>
             </div>
