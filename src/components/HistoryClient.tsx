@@ -24,22 +24,30 @@ export default function HistoryClient({ profile, weeks, players, rankings }: Pro
   return (
     <div className="min-h-screen">
       {/* Navbar */}
-      <nav className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-sm" style={{ borderBottom: '1px solid #2A3550' }}>
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+      <nav className="sticky top-0 z-40" style={{
+        background: 'linear-gradient(180deg, rgba(9,24,48,0.97) 0%, rgba(9,24,48,0.90) 100%)',
+        backdropFilter: 'blur(8px)',
+        borderBottom: '2px solid rgba(74,126,196,0.4)',
+        height: '64px',
+      }}>
+        <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg gold-gradient flex items-center justify-center text-base" style={{ boxShadow: '0 0 12px rgba(245,166,35,0.5)' }}>⚔️</div>
-            <span className="font-display font-bold text-lg hidden sm:block uppercase tracking-widest gold-glow" style={{ color: 'var(--gold)' }}>Classement Last War</span>
+            <span className="text-2xl">⚔️</span>
+            <span className="logo-text text-lg hidden sm:block">Classement Last War</span>
           </div>
-          <div className="flex items-center gap-2">
-            <a href="/dashboard" className="text-sm text-slate-300 hover:text-amber-400 px-3 py-1 transition-colors">
+          <div className="flex items-center gap-1">
+            <a href="/dashboard" style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.8rem', color: '#fff' }}
+               className="px-3 py-1 transition-colors hover:text-yellow-400">
               {t.dashboard}
             </a>
-            <a href="/dashboard/history" className="text-sm text-amber-400 px-3 py-1">
+            <a href="/dashboard/history" style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.8rem', color: '#FFB800', textShadow: '0 0 12px rgba(255,184,0,0.6)' }}
+               className="px-3 py-1">
               {t.history}
             </a>
             <button
               onClick={() => setLang(l => l === 'fr' ? 'en' : 'fr')}
-              className="text-xs text-slate-400 hover:text-amber-400 border border-slate-700 rounded-full px-2 py-1"
+              className="text-xs hover:text-yellow-400 rounded-full px-2 py-1 transition-colors"
+              style={{ color: '#A8C4E8', border: '1px solid #2A4F8A' }}
             >
               {lang === 'fr' ? 'EN' : 'FR'}
             </button>
@@ -54,7 +62,7 @@ export default function HistoryClient({ profile, weeks, players, rankings }: Pro
           </button>
         </div>
 
-        <h1 className="font-display text-2xl font-bold uppercase tracking-wide mb-6 gold-glow" style={{ color: 'var(--gold)' }}>📚 {t.weekHistory}</h1>
+        <h1 className="lw-title text-2xl mb-6">📚 {t.weekHistory}</h1>
 
         {weeks.length === 0 ? (
           <div className="card p-12 text-center">
@@ -90,7 +98,7 @@ export default function HistoryClient({ profile, weeks, players, rankings }: Pro
                   </h2>
                   <span className={`text-xs px-2 py-0.5 rounded-full border ${
                     selectedWeek.type === 'push'
-                      ? 'bg-amber-400/10 border-amber-400/30 text-amber-400'
+                      ? 'bg-yellow-400/10 border-yellow-500/30 text-yellow-400'
                       : 'bg-emerald-400/10 border-emerald-400/30 text-emerald-400'
                   }`}>
                     {selectedWeek.type === 'push' ? t.pushWeek : t.ecoWeek}

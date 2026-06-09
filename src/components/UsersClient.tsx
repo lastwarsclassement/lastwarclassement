@@ -187,28 +187,38 @@ export default function UsersClient({ players, profiles, currentProfile }: Props
   return (
     <div className="min-h-screen">
       {/* Navbar */}
-      <nav className="sticky top-0 z-40 border-b border-slate-700/50 bg-slate-900/90 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+      <nav className="sticky top-0 z-40" style={{
+        background: 'linear-gradient(180deg, rgba(9,24,48,0.97) 0%, rgba(9,24,48,0.90) 100%)',
+        backdropFilter: 'blur(8px)',
+        borderBottom: '2px solid rgba(74,126,196,0.4)',
+        height: '64px',
+      }}>
+        <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg gold-gradient flex items-center justify-center text-sm">⚔️</div>
-            <span className="font-bold text-white text-lg hidden sm:block">{t.title}</span>
+            <span className="text-2xl">⚔️</span>
+            <span className="logo-text text-lg hidden sm:block">Classement Last War</span>
           </div>
-          <div className="flex items-center gap-2">
-            <a href="/dashboard" className="text-sm text-slate-300 hover:text-amber-400 px-3 py-1 transition-colors">{t.dashboard}</a>
-            <a href="/dashboard/users" className="text-sm text-amber-400 px-3 py-1">{lang === 'fr' ? 'Joueurs' : 'Players'}</a>
-            <a href="/dashboard/history" className="text-sm text-slate-300 hover:text-amber-400 px-3 py-1 transition-colors">{t.history}</a>
+          <div className="flex items-center gap-1">
+            <a href="/dashboard" style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.8rem', color: '#fff' }}
+               className="px-3 py-1 transition-colors hover:text-yellow-400">{t.dashboard}</a>
+            <a href="/dashboard/users" style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.8rem', color: '#FFB800', textShadow: '0 0 12px rgba(255,184,0,0.6)' }}
+               className="px-3 py-1">{lang === 'fr' ? 'Joueurs' : 'Players'}</a>
+            <a href="/dashboard/history" style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.8rem', color: '#fff' }}
+               className="px-3 py-1 transition-colors hover:text-yellow-400">{t.history}</a>
             <button
               onClick={() => setLang(l => l === 'fr' ? 'en' : 'fr')}
-              className="text-xs text-slate-400 hover:text-amber-400 border border-slate-700 rounded-full px-2 py-1"
+              className="text-xs hover:text-yellow-400 rounded-full px-2 py-1 transition-colors"
+              style={{ color: '#A8C4E8', border: '1px solid #2A4F8A' }}
             >
               {lang === 'fr' ? 'EN' : 'FR'}
             </button>
             {currentPlayer && (
-              <span className="text-sm text-slate-300 hidden sm:block">{currentPlayer.display_name}</span>
+              <span className="text-sm hidden sm:block px-2" style={{ color: '#A8C4E8' }}>{currentPlayer.display_name}</span>
             )}
             <button
               onClick={() => setShowProfile(true)}
-              className="text-slate-400 hover:text-amber-400 transition-colors p-1"
+              className="p-1 transition-colors hover:text-yellow-400"
+              style={{ color: '#5B7FA8' }}
               title={lang === 'fr' ? 'Paramètres du profil' : 'Profile settings'}
             >
               ⚙️
@@ -226,10 +236,10 @@ export default function UsersClient({ players, profiles, currentProfile }: Props
 
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-white">
+            <h1 className="lw-title text-2xl">
               {lang === 'fr' ? 'Gestion des joueurs' : 'Player Management'}
             </h1>
-            <p className="text-slate-400 text-sm mt-0.5">
+            <p className="text-sm mt-0.5" style={{ color: '#5B7FA8' }}>
               {activeCount} {lang === 'fr' ? 'actifs' : 'active'}
               {inactiveCount > 0 && ` · ${inactiveCount} ${lang === 'fr' ? 'inactifs' : 'inactive'}`}
               {' · '}{profiles.length} {lang === 'fr' ? 'comptes' : 'accounts'}
@@ -237,7 +247,7 @@ export default function UsersClient({ players, profiles, currentProfile }: Props
           </div>
           <div className="flex gap-2 items-center">
             {activeCount >= 100 && (
-              <span className="text-xs text-amber-400 border border-amber-400/30 bg-amber-400/10 px-2 py-1 rounded-full">
+              <span className="counter-badge">
                 {lang === 'fr' ? '100/100 — max atteint' : '100/100 — max reached'}
               </span>
             )}
@@ -384,16 +394,12 @@ export default function UsersClient({ players, profiles, currentProfile }: Props
         )}
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-4 border-b border-slate-700">
+        <div className="flex gap-4 mb-4" style={{ borderBottom: '1px solid #2A4F8A' }}>
           {(['players', 'accounts'] as const).map(tabKey => (
             <button
               key={tabKey}
               onClick={() => setTab(tabKey)}
-              className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
-                tab === tabKey
-                  ? 'border-amber-400 text-amber-400'
-                  : 'border-transparent text-slate-400 hover:text-slate-200'
-              }`}
+              className={`tab${tab === tabKey ? ' active' : ''}`}
             >
               {tabKey === 'players'
                 ? `${lang === 'fr' ? 'Joueurs' : 'Players'} ${activeCount}/100`

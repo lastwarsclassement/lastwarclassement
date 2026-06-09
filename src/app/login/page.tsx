@@ -66,7 +66,8 @@ export default function LoginPage() {
         <div className="flex justify-end mb-6">
           <button
             onClick={() => setLang(l => l === 'fr' ? 'en' : 'fr')}
-            className="text-xs text-slate-400 hover:text-amber-400 transition-colors border border-slate-700 rounded-full px-3 py-1"
+            className="text-xs hover:text-yellow-400 transition-colors rounded-full px-3 py-1"
+            style={{ color: '#A8C4E8', border: '1px solid #2A4F8A' }}
           >
             {lang === 'fr' ? '🇬🇧 EN' : '🇫🇷 FR'}
           </button>
@@ -74,18 +75,16 @@ export default function LoginPage() {
 
         {/* Logo / Title */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl gold-gradient mb-4">
-            <span className="text-2xl">⚔️</span>
-          </div>
-          <h1 className="text-3xl font-bold text-white">{t.title}</h1>
-          <p className="text-slate-400 mt-1">{t.subtitle}</p>
+          <div className="text-5xl mb-4" style={{ filter: 'drop-shadow(0 0 16px rgba(255,184,0,0.4))' }}>⚔️</div>
+          <h1 className="lw-title text-4xl mb-1">{t.title}</h1>
+          <p className="mt-1" style={{ color: '#A8C4E8', fontFamily: 'var(--font-body), Nunito, sans-serif' }}>{t.subtitle}</p>
         </div>
 
         {/* Card */}
         <div className="card p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">{t.username}</label>
+              <label className="block text-sm font-medium mb-1" style={{ color: '#A8C4E8' }}>{t.username}</label>
               <input
                 className="input-field"
                 type="text"
@@ -98,7 +97,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">{t.password}</label>
+              <label className="block text-sm font-medium mb-1" style={{ color: '#A8C4E8' }}>{t.password}</label>
               <div className="relative">
                 <input
                   className="input-field pr-16"
@@ -111,7 +110,8 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(s => !s)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-amber-400 px-2 py-1"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-xs hover:text-yellow-400 px-2 py-1 transition-colors"
+                  style={{ color: '#5B7FA8' }}
                 >
                   {showPassword ? t.hide : t.show}
                 </button>

@@ -204,56 +204,63 @@ export default function DashboardClient({
     return 'text-slate-400'
   }
 
-  const getRankLabel = (rank: number) => {
-    if (rank === 1) return '🥇'
-    if (rank === 2) return '🥈'
-    if (rank === 3) return '🥉'
-    return `#${rank}`
+  const RankCell = ({ rank }: { rank: number }) => {
+    if (rank <= 3) return <span className={`rank-badge rank-${rank}`}>{rank}</span>
+    return <span className="rank-other">#{rank}</span>
   }
 
   return (
     <div className="min-h-screen">
       {/* Navbar */}
-      <nav className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-sm" style={{ borderBottom: '1px solid #2A3550' }}>
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+      <nav className="sticky top-0 z-40" style={{
+        background: 'linear-gradient(180deg, rgba(9,24,48,0.97) 0%, rgba(9,24,48,0.90) 100%)',
+        backdropFilter: 'blur(8px)',
+        borderBottom: '2px solid rgba(74,126,196,0.4)',
+        height: '64px',
+      }}>
+        <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg gold-gradient flex items-center justify-center text-base shadow-lg" style={{ boxShadow: '0 0 12px rgba(245,166,35,0.5)' }}>⚔️</div>
-            <span className="font-display font-bold text-lg hidden sm:block uppercase tracking-widest gold-glow" style={{ color: 'var(--gold)' }}>Classement Last War</span>
+            <span className="text-2xl">⚔️</span>
+            <span className="logo-text text-lg hidden sm:block">Classement Last War</span>
           </div>
 
-          <div className="flex items-center gap-2">
-            {/* Nav links */}
-            <a href="/dashboard" className="text-sm text-slate-300 hover:text-amber-400 px-3 py-1 transition-colors">
+          <div className="flex items-center gap-1">
+            <a href="/dashboard" style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.8rem', color: '#fff' }}
+               className="px-3 py-1 transition-colors hover:text-yellow-400">
               {t.dashboard}
             </a>
             {isAdmin && (
-              <a href="/dashboard/users" className="text-sm text-slate-300 hover:text-amber-400 px-3 py-1 transition-colors">
+              <a href="/dashboard/users" style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.8rem', color: '#fff' }}
+                 className="px-3 py-1 transition-colors hover:text-yellow-400">
                 {lang === 'fr' ? 'Joueurs' : 'Players'}
               </a>
             )}
-            <a href="/dashboard/history" className="text-sm text-slate-300 hover:text-amber-400 px-3 py-1 transition-colors">
+            <a href="/dashboard/history" style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.8rem', color: '#fff' }}
+               className="px-3 py-1 transition-colors hover:text-yellow-400">
               {t.history}
             </a>
 
             <button
               onClick={() => setLang(l => l === 'fr' ? 'en' : 'fr')}
-              className="text-xs text-slate-400 hover:text-amber-400 border border-slate-700 rounded-full px-2 py-1"
+              className="text-xs hover:text-yellow-400 rounded-full px-2 py-1 transition-colors"
+              style={{ color: '#A8C4E8', border: '1px solid #2A4F8A' }}
             >
               {lang === 'fr' ? 'EN' : 'FR'}
             </button>
 
             {currentPlayer && (
-              <span className="text-sm text-slate-300 hidden sm:block">{currentPlayer.display_name}</span>
+              <span className="text-sm hidden sm:block px-2" style={{ color: '#A8C4E8' }}>{currentPlayer.display_name}</span>
             )}
             <button
               onClick={() => setShowProfile(true)}
-              className="text-slate-400 hover:text-amber-400 transition-colors p-1"
+              className="p-1 transition-colors hover:text-yellow-400"
+              style={{ color: '#5B7FA8' }}
               title={lang === 'fr' ? 'Paramètres du profil' : 'Profile settings'}
             >
               ⚙️
             </button>
 
-            <button onClick={handleLogout} className="btn-secondary text-sm py-1 px-3">
+            <button onClick={handleLogout} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '6px 14px' }}>
               {t.logout}
             </button>
           </div>
@@ -266,7 +273,7 @@ export default function DashboardClient({
           {/* Title + week type */}
           <div className="flex flex-wrap gap-3 items-start justify-between mb-3">
             <div>
-              <h1 className="font-display text-2xl font-bold uppercase tracking-wide gold-glow" style={{ color: 'var(--gold)' }}>🏆 {t.dashboard}</h1>
+              <h1 className="lw-title text-2xl">🏆 {t.dashboard}</h1>
               {activeWeek ? (
                 <>
                   <p className={`text-xl font-bold mt-1 ${activeWeek.type === 'push' ? 'text-amber-400' : 'text-emerald-400'}`}>
@@ -351,16 +358,16 @@ export default function DashboardClient({
 
         {/* No active week */}
         {!activeWeek && (
-          <div className="card p-16 text-center" style={{ background: 'radial-gradient(ellipse at center, rgba(245,166,35,0.05) 0%, var(--bg-surface) 70%)' }}>
-            <div className="text-7xl mb-6">🏆</div>
-            <h2 className="font-display text-2xl font-bold uppercase tracking-wide mb-2" style={{ color: 'var(--text-secondary)' }}>
+          <div className="card p-16 text-center" style={{ background: 'radial-gradient(ellipse at center, rgba(255,184,0,0.08) 0%, transparent 60%), linear-gradient(135deg, #1E3F6F 0%, #132D52 100%)' }}>
+            <div className="text-7xl mb-6" style={{ filter: 'drop-shadow(0 0 16px rgba(255,184,0,0.3))' }}>🏆</div>
+            <h2 className="mb-2" style={{ fontFamily: 'var(--font-heading), Oswald, sans-serif', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#A8C4E8', fontSize: '1.3rem' }}>
               {lang === 'fr' ? 'Aucune semaine en cours' : 'No active week'}
             </h2>
-            <p className="mb-8" style={{ color: 'var(--text-muted)' }}>
+            <p className="mb-8" style={{ color: '#5B7FA8', fontFamily: 'var(--font-body), Nunito, sans-serif' }}>
               {lang === 'fr' ? 'Démarrez une nouvelle semaine pour voir le classement' : 'Start a new week to display the leaderboard'}
             </p>
             {isAdmin && (
-              <button onClick={handleStartWeek} className="btn-primary text-base px-8 py-3" disabled={startingWeek}>
+              <button onClick={handleStartWeek} className="btn-primary" style={{ fontSize: '1rem', padding: '12px 36px' }} disabled={startingWeek}>
                 {startingWeek ? t.loading : `▶ ${t.startWeek}`}
               </button>
             )}
@@ -395,9 +402,7 @@ export default function DashboardClient({
                         } ${getRankBg(row.rank)}`}
                       >
                         <td className="px-4 py-3">
-                          <span className={`font-bold text-base ${getRankColor(row.rank)}`}>
-                            {getRankLabel(row.rank)}
-                          </span>
+                          <RankCell rank={row.rank} />
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2 flex-wrap">
@@ -429,7 +434,7 @@ export default function DashboardClient({
                           {row.sanctionPoints < 0 ? row.sanctionPoints : '—'}
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <span className={`text-lg font-bold ${row.rank <= 3 ? getRankColor(row.rank) : 'text-white'}`}>
+                          <span className={`text-lg font-bold ${row.rank === 1 ? 'rank-gold' : row.rank === 2 ? 'rank-silver' : row.rank === 3 ? 'rank-bronze' : 'text-white'}`}>
                             {row.totalPoints}
                           </span>
                         </td>
