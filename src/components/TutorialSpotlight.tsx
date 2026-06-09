@@ -155,6 +155,8 @@ function renderBody(text: string) {
 
 interface Props { isAdmin: boolean; lang: Lang }
 
+const PAD = 10
+
 export default function TutorialSpotlight({ isAdmin, lang }: Props) {
   const router = useRouter()
   const pathname = usePathname()
@@ -196,29 +198,34 @@ export default function TutorialSpotlight({ isAdmin, lang }: Props) {
       return
     }
 
+    const NAVBAR_H = 72 // navbar height + small buffer
+
     const find = () => {
       const el = document.querySelector(`[data-tutorial="${step.target}"]`) as HTMLElement | null
       if (!el) {
-        // Target not found — centered modal
         setReady(true)
         return
       }
       const r = el.getBoundingClientRect()
-      const inView = r.top >= 0 && r.bottom <= window.innerHeight
-      if (inView) {
-        setRect({ top: r.top, left: r.left, right: r.right, bottom: r.bottom, width: r.width, height: r.height })
+      const inView = r.top >= NAVBAR_H && r.bottom <= window.innerHeight - 20
+
+      const getAndSet = () => {
+        const r2 = el.getBoundingClientRect()
+        setRect({ top: r2.top, left: r2.left, right: r2.right, bottom: r2.bottom, width: r2.width, height: r2.height })
         setReady(true)
+      }
+
+      if (inView) {
+        getAndSet()
       } else {
-        el.scrollIntoView({ behavior: 'instant' as ScrollBehavior, block: 'center' })
-        requestAnimationFrame(() => {
-          const r2 = el.getBoundingClientRect()
-          setRect({ top: r2.top, left: r2.left, right: r2.right, bottom: r2.bottom, width: r2.width, height: r2.height })
-          setReady(true)
-        })
+        // Scroll element just below navbar — window.scrollTo(x,y) is always synchronous
+        const target = window.scrollY + r.top - NAVBAR_H - PAD
+        window.scrollTo(0, Math.max(0, target))
+        // One rAF so the browser commits the scroll before we measure
+        requestAnimationFrame(getAndSet)
       }
     }
 
-    // Short delay only for first render after page load
     const t = setTimeout(find, 60)
     return () => clearTimeout(t)
   }, [tut?.step, pathname])
@@ -248,7 +255,6 @@ export default function TutorialSpotlight({ isAdmin, lang }: Props) {
 
   const isFirst = tut.step === 0
   const isLast = tut.step === steps.length - 1
-  const PAD = 10
   const W = typeof window !== 'undefined' ? window.innerWidth : 1440
   const H = typeof window !== 'undefined' ? window.innerHeight : 900
   const TW = 320
