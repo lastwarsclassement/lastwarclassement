@@ -61,19 +61,14 @@ body {
   font-family: var(--font-display), 'Lilita One', sans-serif;
   font-weight: 700;
   text-transform: uppercase;
-  color: #FF8C00;
-  -webkit-text-stroke: 2px #FFFFFF;
-  text-shadow:
-    3px 3px 0px #8B3000,
-    6px 6px 0px rgba(0,0,0,0.3);
+  color: #FFB800;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
   letter-spacing: 0.04em;
 }
 
 .logo-text {
   font-family: var(--font-display), 'Lilita One', sans-serif;
-  color: #FF8C00;
-  -webkit-text-stroke: 1px #fff;
-  text-shadow: 2px 2px 0 #8B3000;
+  color: #FFB800;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
