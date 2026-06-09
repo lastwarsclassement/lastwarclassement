@@ -6,6 +6,7 @@ import { TRANSLATIONS, Lang } from '@/lib/utils'
 import type { Player, Profile } from '@/types'
 import ProfileModal from './ProfileModal'
 import EditAccountModal from './EditAccountModal'
+import Navbar from './Navbar'
 
 interface Props {
   players: Player[]
@@ -186,46 +187,13 @@ export default function UsersClient({ players, profiles, currentProfile }: Props
 
   return (
     <div className="min-h-screen">
-      {/* Navbar */}
-      <nav className="sticky top-0 z-40" style={{
-        background: 'linear-gradient(180deg, rgba(9,24,48,0.97) 0%, rgba(9,24,48,0.90) 100%)',
-        backdropFilter: 'blur(8px)',
-        borderBottom: '2px solid rgba(74,126,196,0.4)',
-        height: '64px',
-      }}>
-        <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">⚔️</span>
-            <span className="logo-text text-lg hidden sm:block">Classement Last War</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <a href="/dashboard" style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.8rem', color: '#fff' }}
-               className="px-3 py-1 transition-colors hover:text-yellow-400">{t.dashboard}</a>
-            <a href="/dashboard/users" style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.8rem', color: '#fff' }}
-               className="px-3 py-1 transition-colors hover:text-yellow-400">{lang === 'fr' ? 'Joueurs' : 'Players'}</a>
-            <a href="/dashboard/history" style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.8rem', color: '#fff' }}
-               className="px-3 py-1 transition-colors hover:text-yellow-400">{t.history}</a>
-            <button
-              onClick={() => setLang(l => l === 'fr' ? 'en' : 'fr')}
-              className="text-xs hover:text-yellow-400 rounded-full px-2 py-1 transition-colors"
-              style={{ color: '#A8C4E8', border: '1px solid #2A4F8A' }}
-            >
-              {lang === 'fr' ? 'EN' : 'FR'}
-            </button>
-            {currentPlayer && (
-              <span className="text-sm hidden sm:block px-2" style={{ color: '#A8C4E8' }}>{currentPlayer.display_name}</span>
-            )}
-            <button
-              onClick={() => setShowProfile(true)}
-              className="p-1 transition-colors hover:text-yellow-400"
-              style={{ color: '#5B7FA8' }}
-              title={lang === 'fr' ? 'Paramètres du profil' : 'Profile settings'}
-            >
-              ⚙️
-            </button>
-          </div>
-        </div>
-      </nav>
+      <Navbar
+        lang={lang}
+        setLang={setLang}
+        isAdmin={currentProfile.role === 'admin'}
+        playerName={currentPlayer?.display_name}
+        onProfile={() => setShowProfile(true)}
+      />
 
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="mb-4">

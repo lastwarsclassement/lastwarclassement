@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { TRANSLATIONS, Lang, getRankColor, getRankBg } from '@/lib/utils'
 import { getBirthdaysInRange, getWeekDates, getNextBirthdayDate, computeContributionPoints } from '@/lib/scoring'
 import type { Player, Profile, Week, DailyScore, Sanction, WeeklyRanking, PlayerRole } from '@/types'
@@ -10,6 +9,7 @@ import ScoreEntryModal from './ScoreEntryModal'
 import SanctionModal from './SanctionModal'
 import WeekValidationModal from './WeekValidationModal'
 import ProfileModal from './ProfileModal'
+import Navbar from './Navbar'
 
 interface Props {
   currentUser: { id: string; email?: string }
@@ -168,12 +168,6 @@ export default function DashboardClient({
     router.refresh()
   }
 
-  async function handleLogout() {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push('/login')
-  }
-
   async function handleReopenWeek() {
     if (!activeWeek || !isAdmin) return
     await fetch('/api/admin/week', {
@@ -211,61 +205,13 @@ export default function DashboardClient({
 
   return (
     <div className="min-h-screen">
-      {/* Navbar */}
-      <nav className="sticky top-0 z-40" style={{
-        background: 'linear-gradient(180deg, rgba(9,24,48,0.97) 0%, rgba(9,24,48,0.90) 100%)',
-        backdropFilter: 'blur(8px)',
-        borderBottom: '2px solid rgba(74,126,196,0.4)',
-        height: '64px',
-      }}>
-        <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">⚔️</span>
-            <span className="logo-text text-lg hidden sm:block">Classement Last War</span>
-          </div>
-
-          <div className="flex items-center gap-1">
-            <a href="/dashboard" style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.8rem', color: '#fff' }}
-               className="px-3 py-1 transition-colors hover:text-yellow-400">
-              {t.dashboard}
-            </a>
-            {isAdmin && (
-              <a href="/dashboard/users" style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.8rem', color: '#fff' }}
-                 className="px-3 py-1 transition-colors hover:text-yellow-400">
-                {lang === 'fr' ? 'Joueurs' : 'Players'}
-              </a>
-            )}
-            <a href="/dashboard/history" style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.8rem', color: '#fff' }}
-               className="px-3 py-1 transition-colors hover:text-yellow-400">
-              {t.history}
-            </a>
-
-            <button
-              onClick={() => setLang(l => l === 'fr' ? 'en' : 'fr')}
-              className="text-xs hover:text-yellow-400 rounded-full px-2 py-1 transition-colors"
-              style={{ color: '#A8C4E8', border: '1px solid #2A4F8A' }}
-            >
-              {lang === 'fr' ? 'EN' : 'FR'}
-            </button>
-
-            {currentPlayer && (
-              <span className="text-sm hidden sm:block px-2" style={{ color: '#A8C4E8' }}>{currentPlayer.display_name}</span>
-            )}
-            <button
-              onClick={() => setShowProfile(true)}
-              className="p-1 transition-colors hover:text-yellow-400"
-              style={{ color: '#5B7FA8' }}
-              title={lang === 'fr' ? 'Paramètres du profil' : 'Profile settings'}
-            >
-              ⚙️
-            </button>
-
-            <button onClick={handleLogout} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '6px 14px' }}>
-              {t.logout}
-            </button>
-          </div>
-        </div>
-      </nav>
+      <Navbar
+        lang={lang}
+        setLang={setLang}
+        isAdmin={isAdmin}
+        playerName={currentPlayer?.display_name}
+        onProfile={() => setShowProfile(true)}
+      />
 
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Header row */}

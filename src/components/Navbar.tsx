@@ -1,0 +1,101 @@
+'use client'
+
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+import { TRANSLATIONS, Lang } from '@/lib/utils'
+
+interface NavbarProps {
+  lang: Lang
+  setLang: (l: Lang) => void
+  isAdmin?: boolean
+  playerName?: string
+  onProfile?: () => void
+}
+
+export default function Navbar({ lang, setLang, isAdmin, playerName, onProfile }: NavbarProps) {
+  const router = useRouter()
+  const t = TRANSLATIONS[lang]
+
+  async function handleLogout() {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push('/login')
+  }
+
+  const linkStyle = {
+    fontWeight: 700,
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.08em',
+    fontSize: '0.8rem',
+    color: '#fff',
+  }
+
+  return (
+    <nav className="sticky top-0 z-40" style={{
+      background: 'linear-gradient(180deg, rgba(9,24,48,0.97) 0%, rgba(9,24,48,0.90) 100%)',
+      backdropFilter: 'blur(8px)',
+      borderBottom: '2px solid rgba(74,126,196,0.4)',
+      height: '64px',
+    }}>
+      <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
+
+        {/* Logo */}
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">⚔️</span>
+          <span className="logo-text text-lg hidden sm:block">Classement Last War</span>
+        </div>
+
+        {/* Right side */}
+        <div className="flex items-center gap-1">
+
+          {/* Nav links */}
+          <a href="/dashboard" style={linkStyle} className="px-3 py-1 transition-colors hover:text-yellow-400">
+            {t.dashboard}
+          </a>
+          {isAdmin && (
+            <a href="/dashboard/users" style={linkStyle} className="px-3 py-1 transition-colors hover:text-yellow-400">
+              {lang === 'fr' ? 'Joueurs' : 'Players'}
+            </a>
+          )}
+          <a href="/dashboard/history" style={linkStyle} className="px-3 py-1 transition-colors hover:text-yellow-400">
+            {t.history}
+          </a>
+
+          {/* Lang toggle */}
+          <button
+            onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}
+            className="text-xs hover:text-yellow-400 rounded-full px-2 py-1 transition-colors"
+            style={{ color: '#A8C4E8', border: '1px solid #2A4F8A' }}
+          >
+            {lang === 'fr' ? 'EN' : 'FR'}
+          </button>
+
+          {/* Player name */}
+          {playerName && (
+            <span className="text-sm hidden sm:block px-2" style={{ color: '#A8C4E8' }}>
+              {playerName}
+            </span>
+          )}
+
+          {/* Profile button */}
+          {onProfile && (
+            <button
+              onClick={onProfile}
+              className="p-1 transition-colors hover:text-yellow-400"
+              style={{ color: '#5B7FA8' }}
+              title={lang === 'fr' ? 'Paramètres du profil' : 'Profile settings'}
+            >
+              ⚙️
+            </button>
+          )}
+
+          {/* Logout */}
+          <button onClick={handleLogout} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '6px 14px' }}>
+            {t.logout}
+          </button>
+
+        </div>
+      </div>
+    </nav>
+  )
+}
