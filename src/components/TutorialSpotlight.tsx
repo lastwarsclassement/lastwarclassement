@@ -257,7 +257,8 @@ export default function TutorialSpotlight({ isAdmin, lang }: Props) {
   const isLast = tut.step === steps.length - 1
   const W = typeof window !== 'undefined' ? window.innerWidth : 1440
   const H = typeof window !== 'undefined' ? window.innerHeight : 900
-  const TW = 320
+  const isMobile = W < 520
+  const TW = isMobile ? W - 0 : 340  // full-width on mobile
 
   function goTo(n: number) {
     const ns: TutorialState = { active: true, role: isAdmin ? 'admin' : 'reader', step: n }
@@ -268,9 +269,16 @@ export default function TutorialSpotlight({ isAdmin, lang }: Props) {
   }
   function close() { clearState(); setTut(null); setRect(null); setReady(false) }
 
-  // Tooltip position
+  // Tooltip position — bottom sheet on mobile, adjacent to target on desktop
   let tipStyle: React.CSSProperties
-  if (rect) {
+  if (isMobile) {
+    tipStyle = {
+      position: 'fixed', bottom: 0, left: 0, right: 0,
+      borderRadius: '16px 16px 0 0',
+      maxHeight: '55vh', overflowY: 'auto',
+      zIndex: 9002,
+    }
+  } else if (rect) {
     const spaceBelow = H - rect.bottom - PAD
     const spaceAbove = rect.top - PAD
     const idealLeft = Math.max(12, Math.min(rect.left + rect.width / 2 - TW / 2, W - TW - 12))
@@ -283,10 +291,13 @@ export default function TutorialSpotlight({ isAdmin, lang }: Props) {
     tipStyle = { position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: TW, zIndex: 9002 }
   }
 
+  // On mobile, the backdrop only covers above the bottom sheet (not the full screen split)
+  const SHEET_H = isMobile ? Math.round(H * 0.55) : 0
+
   return (
     <>
       {/* Backdrop */}
-      {rect ? (
+      {rect && !isMobile ? (
         <>
           <div onClick={close} style={{ position: 'fixed', top: 0, left: 0, right: 0, height: Math.max(0, rect.top - PAD), background: 'rgba(5,12,28,0.88)', zIndex: 9000 }} />
           <div onClick={close} style={{ position: 'fixed', top: rect.bottom + PAD, left: 0, right: 0, bottom: 0, background: 'rgba(5,12,28,0.88)', zIndex: 9000 }} />
@@ -295,12 +306,24 @@ export default function TutorialSpotlight({ isAdmin, lang }: Props) {
           {/* Golden border */}
           <div style={{ position: 'fixed', top: rect.top - PAD, left: rect.left - PAD, width: rect.width + PAD * 2, height: rect.height + PAD * 2, border: '2px solid #FFB800', borderRadius: '10px', boxShadow: '0 0 0 2px rgba(255,184,0,0.2), 0 0 28px rgba(255,184,0,0.25)', zIndex: 9001, pointerEvents: 'none' }} />
         </>
+      ) : rect && isMobile ? (
+        <>
+          {/* Mobile: dark overlay above sheet, spotlight around target */}
+          <div onClick={close} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: SHEET_H, background: 'rgba(5,12,28,0.82)', zIndex: 9000 }} />
+          {/* Golden border */}
+          <div style={{ position: 'fixed', top: rect.top - PAD, left: rect.left - PAD, width: rect.width + PAD * 2, height: rect.height + PAD * 2, border: '2px solid #FFB800', borderRadius: '10px', boxShadow: '0 0 28px rgba(255,184,0,0.25)', zIndex: 9001, pointerEvents: 'none' }} />
+        </>
       ) : (
         <div onClick={close} style={{ position: 'fixed', inset: 0, background: 'rgba(5,12,28,0.88)', zIndex: 9000 }} />
       )}
 
       {/* Tooltip */}
-      <div style={tipStyle} className="card fade-in" onClick={e => e.stopPropagation()}>
+      <div key={tut.step} style={tipStyle} className="card fade-in" onClick={e => e.stopPropagation()}>
+
+        {/* Mobile drag handle */}
+        {isMobile && (
+          <div style={{ width: '36px', height: '4px', background: '#2A4F8A', borderRadius: '2px', margin: '0 auto 14px' }} />
+        )}
 
         {/* Progress bar */}
         <div className="flex gap-0.5 mb-3">
@@ -313,34 +336,34 @@ export default function TutorialSpotlight({ isAdmin, lang }: Props) {
 
         {/* Header */}
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xl">{step.icon}</span>
+          <span style={{ fontSize: isMobile ? '1.3rem' : '1.1rem' }}>{step.icon}</span>
           <span style={{ fontFamily: 'var(--font-heading)', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: '#5B7FA8' }}>
             {tut.step + 1} / {steps.length}
           </span>
         </div>
 
         {/* Title */}
-        <h3 style={{ fontFamily: 'var(--font-heading), Oswald, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#FFB800', fontSize: '0.88rem', marginBottom: '0.5rem', lineHeight: 1.3 }}>
+        <h3 style={{ fontFamily: 'var(--font-heading), Oswald, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#FFB800', fontSize: isMobile ? '0.95rem' : '0.88rem', marginBottom: '0.5rem', lineHeight: 1.3 }}>
           {lang === 'fr' ? step.title : step.titleEn}
         </h3>
 
         {/* Body */}
-        <div style={{ color: '#A8C4E8', fontFamily: 'var(--font-body), Nunito, sans-serif', fontSize: '0.8rem', lineHeight: 1.65, marginBottom: '0.875rem' }}>
+        <div style={{ color: '#A8C4E8', fontFamily: 'var(--font-body), Nunito, sans-serif', fontSize: isMobile ? '0.875rem' : '0.8rem', lineHeight: 1.65, marginBottom: '0.875rem' }}>
           {renderBody(lang === 'fr' ? step.body : step.bodyEn)}
         </div>
 
         {/* Navigation */}
         <div className="flex items-center justify-between">
-          <button onClick={close} style={{ fontSize: '0.7rem', color: '#5B7FA8', background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0', fontFamily: 'var(--font-body)' }}>
+          <button onClick={close} style={{ fontSize: '0.7rem', color: '#5B7FA8', background: 'none', border: 'none', cursor: 'pointer', padding: isMobile ? '8px 0' : '2px 0', fontFamily: 'var(--font-body)' }}>
             {lang === 'fr' ? 'Quitter' : 'Exit'}
           </button>
           <div className="flex gap-1.5">
             {!isFirst && (
-              <button onClick={() => goTo(tut.step - 1)} className="btn-secondary" style={{ fontSize: '0.75rem', padding: '5px 12px' }}>←</button>
+              <button onClick={() => goTo(tut.step - 1)} className="btn-secondary" style={{ fontSize: '0.75rem', padding: isMobile ? '8px 16px' : '5px 12px' }}>←</button>
             )}
             {isLast
-              ? <button onClick={close} className="btn-primary" style={{ fontSize: '0.75rem', padding: '5px 14px' }}>✓ {lang === 'fr' ? 'Terminer' : 'Finish'}</button>
-              : <button onClick={() => goTo(tut.step + 1)} className="btn-primary" style={{ fontSize: '0.75rem', padding: '5px 14px' }}>{lang === 'fr' ? 'Suivant' : 'Next'} →</button>
+              ? <button onClick={close} className="btn-primary" style={{ fontSize: '0.75rem', padding: isMobile ? '8px 20px' : '5px 14px' }}>✓ {lang === 'fr' ? 'Terminer' : 'Finish'}</button>
+              : <button onClick={() => goTo(tut.step + 1)} className="btn-primary" style={{ fontSize: '0.75rem', padding: isMobile ? '8px 20px' : '5px 14px' }}>{lang === 'fr' ? 'Suivant' : 'Next'} →</button>
             }
           </div>
         </div>
