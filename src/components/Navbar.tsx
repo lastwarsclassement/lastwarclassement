@@ -1,10 +1,9 @@
 'use client'
 
-import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { TRANSLATIONS, Lang } from '@/lib/utils'
-import TutorialModal from './TutorialModal'
+import TutorialSpotlight, { startTutorial } from './TutorialSpotlight'
 
 interface NavbarProps {
   lang: Lang
@@ -17,7 +16,6 @@ interface NavbarProps {
 export default function Navbar({ lang, setLang, isAdmin, playerName, onProfile }: NavbarProps) {
   const router = useRouter()
   const t = TRANSLATIONS[lang]
-  const [showTutorial, setShowTutorial] = useState(false)
 
   async function handleLogout() {
     const supabase = createClient()
@@ -61,7 +59,7 @@ export default function Navbar({ lang, setLang, isAdmin, playerName, onProfile }
                 {lang === 'fr' ? 'Joueurs' : 'Players'}
               </a>
             )}
-            <a href="/dashboard/history" style={linkStyle} className="px-3 py-1 transition-colors hover:text-yellow-400">
+            <a href="/dashboard/history" data-tutorial="history-link" style={linkStyle} className="px-3 py-1 transition-colors hover:text-yellow-400">
               {t.history}
             </a>
 
@@ -76,7 +74,7 @@ export default function Navbar({ lang, setLang, isAdmin, playerName, onProfile }
 
             {/* Tutorial button */}
             <button
-              onClick={() => setShowTutorial(true)}
+              onClick={() => startTutorial(isAdmin ? 'admin' : 'reader')}
               className="flex items-center justify-center rounded-full transition-all hover:border-yellow-400 hover:text-yellow-400"
               style={{
                 width: '24px',
@@ -103,6 +101,7 @@ export default function Navbar({ lang, setLang, isAdmin, playerName, onProfile }
             {/* Profile button */}
             {onProfile && (
               <button
+                data-tutorial="profile-btn"
                 onClick={onProfile}
                 className="p-1 transition-colors hover:text-yellow-400"
                 style={{ color: '#5B7FA8' }}
@@ -121,13 +120,7 @@ export default function Navbar({ lang, setLang, isAdmin, playerName, onProfile }
         </div>
       </nav>
 
-      {showTutorial && (
-        <TutorialModal
-          isAdmin={!!isAdmin}
-          lang={lang}
-          onClose={() => setShowTutorial(false)}
-        />
-      )}
+      <TutorialSpotlight isAdmin={!!isAdmin} lang={lang} />
     </>
   )
 }

@@ -237,6 +237,7 @@ export default function UsersClient({ players, profiles, currentProfile }: Props
               </button>
             )}
             <button
+              data-tutorial="add-player-btn"
               onClick={() => {
                 setNewDisplayName('')
                 setNewUsername('')
@@ -368,6 +369,7 @@ export default function UsersClient({ players, profiles, currentProfile }: Props
               key={tabKey}
               onClick={() => setTab(tabKey)}
               className={`tab${tab === tabKey ? ' active' : ''}`}
+              data-tutorial={tabKey === 'accounts' ? 'accounts-tab' : undefined}
             >
               {tabKey === 'players'
                 ? `${lang === 'fr' ? 'Joueurs' : 'Players'} ${activeCount}/100`
@@ -389,7 +391,7 @@ export default function UsersClient({ players, profiles, currentProfile }: Props
 
         {/* Players tab */}
         {tab === 'players' && (
-          <div className="card overflow-hidden">
+          <div data-tutorial="players-table" className="card overflow-hidden">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-700">

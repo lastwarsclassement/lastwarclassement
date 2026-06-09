@@ -248,6 +248,7 @@ export default function DashboardClient({
               {activeWeek.status === 'active' && (
                 <div className="flex gap-2">
                   <button
+                    data-tutorial="toggle-week-type"
                     onClick={handleToggleWeekType}
                     disabled={weekTypeLoading}
                     className="btn-secondary text-sm"
@@ -261,13 +262,13 @@ export default function DashboardClient({
               <div className="flex flex-wrap gap-2">
                 {activeWeek.status === 'active' && (
                   <>
-                    <button onClick={() => setShowScoreEntry(true)} className="btn-primary text-sm">
+                    <button data-tutorial="enter-scores-btn" onClick={() => setShowScoreEntry(true)} className="btn-primary text-sm">
                       📊 {t.enterScores}
                     </button>
-                    <button onClick={() => setShowSanction(true)} className="btn-secondary text-sm">
+                    <button data-tutorial="sanctions-btn" onClick={() => setShowSanction(true)} className="btn-secondary text-sm">
                       ⚠️ {t.sanctions}
                     </button>
-                    <button onClick={() => setShowValidation(true)} className="btn-primary text-sm">
+                    <button data-tutorial="validate-btn" onClick={() => setShowValidation(true)} className="btn-primary text-sm">
                       ✅ {t.validateWeek}
                     </button>
                     <button onClick={handleDeleteWeek} className="btn-danger text-sm">
@@ -276,7 +277,7 @@ export default function DashboardClient({
                   </>
                 )}
                 {activeWeek.status === 'validated' && (
-                  <button onClick={handleReopenWeek} className="btn-secondary text-sm">
+                  <button data-tutorial="reopen-btn" onClick={handleReopenWeek} className="btn-secondary text-sm">
                     🔓 {t.reopenWeek}
                   </button>
                 )}
@@ -313,7 +314,7 @@ export default function DashboardClient({
               {lang === 'fr' ? 'Démarrez une nouvelle semaine pour voir le classement' : 'Start a new week to display the leaderboard'}
             </p>
             {isAdmin && (
-              <button onClick={handleStartWeek} className="btn-primary" style={{ fontSize: '1rem', padding: '12px 36px' }} disabled={startingWeek}>
+              <button data-tutorial="start-week-btn" onClick={handleStartWeek} className="btn-primary" style={{ fontSize: '1rem', padding: '12px 36px' }} disabled={startingWeek}>
                 {startingWeek ? t.loading : `▶ ${t.startWeek}`}
               </button>
             )}
@@ -322,7 +323,7 @@ export default function DashboardClient({
 
         {/* Leaderboard table */}
         {(activeWeek || displayRows.length > 0) && (
-          <div className="card overflow-hidden">
+          <div data-tutorial="leaderboard-table" className="card overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>

@@ -57,6 +57,7 @@ export default function HistoryClient({ profile, weeks, players, rankings }: Pro
                 {lang === 'fr' ? 'Semaine :' : 'Week:'}
               </label>
               <select
+                data-tutorial="history-dropdown"
                 value={selectedWeekId}
                 onChange={e => setSelectedWeekId(e.target.value)}
                 className="input-field max-w-xs"
