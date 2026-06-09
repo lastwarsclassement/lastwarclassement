@@ -81,8 +81,8 @@ const ADMIN_STEPS: Step[] = [
   {
     icon: '✅', page: '/dashboard', target: 'validate-btn',
     title: 'Valider la semaine', titleEn: 'Validate the Week',
-    body: 'Ce bouton clôture la semaine et fige le classement.\n\nL\'app attribue automatiquement :\n• **Top 7 → Pilotes** (-30 pts base semaine suivante)\n• **7 suivants → VIP** (-30 pts base)\n• **Anniversaires** → VIP forcé (-60 pts si top 7)\n\nVérifiez le récapitulatif puis confirmez.',
-    bodyEn: 'This button closes the week and locks the ranking.\n\nThe app automatically assigns:\n• **Top 7 → Pilots** (-30 pts next week base)\n• **Next 7 → VIP** (-30 pts base)\n• **Birthdays** → forced VIP (-60 pts if top 7)\n\nVerify the summary then confirm.',
+    body: 'Ce bouton clôture la semaine et fige le classement.\n\nL\'app attribue automatiquement :\n• **Top 7 → Pilotes** : base semaine suivante = **0**\n• **7 suivants → VIP** : base semaine suivante = **0**\n• **Anniversaires** → VIP forcé (base = **0**)\n• **Autres joueurs** → conservent leurs points comme base\n\nVérifiez le récapitulatif puis confirmez.',
+    bodyEn: 'This button closes the week and locks the ranking.\n\nThe app automatically assigns:\n• **Top 7 → Pilots**: next week base = **0**\n• **Next 7 → VIP**: next week base = **0**\n• **Birthdays** → forced VIP (base = **0**)\n• **Other players** → keep their points as base\n\nVerify the summary then confirm.',
   },
   {
     icon: '🔓', page: '/dashboard', target: 'reopen-btn',

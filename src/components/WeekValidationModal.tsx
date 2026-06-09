@@ -103,10 +103,9 @@ export default function WeekValidationModal({ players, week, rows, lang, onClose
     return null
   }
 
-  function getScoreDeduction(playerId: string): number {
-    if (birthdayBothRoles.includes(playerId)) return -60
-    if (pilots.includes(playerId) || vips.includes(playerId)) return -30
-    return 0
+  function getBaseScoreNextWeek(playerId: string, totalPoints: number): number {
+    if (pilots.includes(playerId) || vips.includes(playerId)) return 0
+    return totalPoints
   }
 
   async function handleValidate() {
@@ -118,7 +117,7 @@ export default function WeekValidationModal({ players, week, rows, lang, onClose
       rank: row.rank,
       total_points: row.totalPoints,
       role: getRole(row.player.id),
-      base_score_next_week: row.totalPoints + getScoreDeduction(row.player.id),
+      base_score_next_week: getBaseScoreNextWeek(row.player.id, row.totalPoints),
     }))
 
     const res = await fetch('/api/admin/validate-week', {
@@ -182,8 +181,8 @@ export default function WeekValidationModal({ players, week, rows, lang, onClose
               return p ? (
                 <div key={id} className="text-xs text-slate-300 flex items-center gap-1 mb-0.5">
                   <span>{p.display_name}</span>
-                  {isBirthday && <span className="text-pink-400">🎂 -60pts</span>}
-                  {!isBirthday && <span className="text-amber-600">-30pts</span>}
+                  {isBirthday && <span className="text-pink-400">🎂</span>}
+                  <span className="text-amber-600">→ 0</span>
                 </div>
               ) : null
             })}
@@ -199,7 +198,7 @@ export default function WeekValidationModal({ players, week, rows, lang, onClose
                 <div key={id} className="text-xs text-slate-300 flex items-center gap-1 mb-0.5">
                   <span>{p.display_name}</span>
                   {isBirthday && <span className="text-pink-400">🎂</span>}
-                  <span className="text-purple-600">-30pts</span>
+                  <span className="text-purple-600">→ 0</span>
                 </div>
               ) : null
             })}
@@ -214,19 +213,17 @@ export default function WeekValidationModal({ players, week, rows, lang, onClose
           <div className="space-y-1 max-h-48 overflow-y-auto">
             {rows.slice(0, 15).map(row => {
               const role = getRole(row.player.id)
-              const deduction = getScoreDeduction(row.player.id)
-              const nextBase = row.totalPoints + deduction
+              const nextBase = getBaseScoreNextWeek(row.player.id, row.totalPoints)
+              const resetsToZero = nextBase === 0 && row.totalPoints !== 0
               return (
                 <div key={row.player.id} className="flex items-center gap-2 text-xs px-2 py-1.5 rounded bg-slate-800/50">
                   <span className="text-slate-500 w-5 text-right">{row.rank}</span>
                   <span className="text-white flex-1">{row.player.display_name}</span>
-                  {role === 'pilot' && <span className="badge-pilot">Pilote</span>}
+                  {role === 'pilot' && <span className="badge-pilot">{lang === 'fr' ? 'Pilote' : 'Pilot'}</span>}
                   {role === 'vip' && <span className="badge-vip">VIP</span>}
                   <span className="text-slate-300 font-medium">{row.totalPoints}</span>
-                  {deduction !== 0 && (
-                    <span className="text-red-400">{deduction}</span>
-                  )}
-                  <span className="text-amber-400 font-medium">→ {nextBase}</span>
+                  {resetsToZero && <span className="text-red-400">→ 0</span>}
+                  {!resetsToZero && <span className="text-amber-400 font-medium">→ {nextBase}</span>}
                 </div>
               )
             })}
