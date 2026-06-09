@@ -160,6 +160,7 @@ export default function TutorialSpotlight({ isAdmin, lang }: Props) {
   const pathname = usePathname()
   const [tut, setTut] = useState<TutorialState | null>(null)
   const [rect, setRect] = useState<{ top: number; left: number; right: number; bottom: number; width: number; height: number } | null>(null)
+  const [ready, setReady] = useState(false)
 
   const steps = isAdmin ? ADMIN_STEPS : READER_STEPS
 
@@ -180,26 +181,45 @@ export default function TutorialSpotlight({ isAdmin, lang }: Props) {
     const step = steps[tut.step]
     if (!step) return
 
+    setReady(false)
+    setRect(null)
+
     // Navigate if needed
     if (step.page && step.page !== pathname) {
       router.push(step.page)
       return
     }
 
-    setRect(null)
-    if (!step.target) return
+    // No target — centered modal, show immediately
+    if (!step.target) {
+      setReady(true)
+      return
+    }
 
     const find = () => {
       const el = document.querySelector(`[data-tutorial="${step.target}"]`) as HTMLElement | null
-      if (!el) return
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      setTimeout(() => {
-        const r = el.getBoundingClientRect()
+      if (!el) {
+        // Target not found — centered modal
+        setReady(true)
+        return
+      }
+      const r = el.getBoundingClientRect()
+      const inView = r.top >= 0 && r.bottom <= window.innerHeight
+      if (inView) {
         setRect({ top: r.top, left: r.left, right: r.right, bottom: r.bottom, width: r.width, height: r.height })
-      }, 380)
+        setReady(true)
+      } else {
+        el.scrollIntoView({ behavior: 'instant' as ScrollBehavior, block: 'center' })
+        requestAnimationFrame(() => {
+          const r2 = el.getBoundingClientRect()
+          setRect({ top: r2.top, left: r2.left, right: r2.right, bottom: r2.bottom, width: r2.width, height: r2.height })
+          setReady(true)
+        })
+      }
     }
 
-    const t = setTimeout(find, 120)
+    // Short delay only for first render after page load
+    const t = setTimeout(find, 60)
     return () => clearTimeout(t)
   }, [tut?.step, pathname])
 
@@ -222,7 +242,7 @@ export default function TutorialSpotlight({ isAdmin, lang }: Props) {
     }
   }, [tut?.active, tut?.step])
 
-  if (!tut?.active) return null
+  if (!tut?.active || !ready) return null
   const step = steps[tut.step]
   if (!step) return null
 
@@ -236,10 +256,11 @@ export default function TutorialSpotlight({ isAdmin, lang }: Props) {
   function goTo(n: number) {
     const ns: TutorialState = { active: true, role: isAdmin ? 'admin' : 'reader', step: n }
     saveState(ns)
-    setTut(ns)
+    setReady(false)
     setRect(null)
+    setTut(ns)
   }
-  function close() { clearState(); setTut(null); setRect(null) }
+  function close() { clearState(); setTut(null); setRect(null); setReady(false) }
 
   // Tooltip position
   let tipStyle: React.CSSProperties
