@@ -154,8 +154,8 @@ export default function UsersClient({ players, profiles, currentProfile }: Props
 
   async function handleAddDemo() {
     if (!confirm(lang === 'fr'
-      ? '100 joueurs démo vont être ajoutés. Continuer ?'
-      : 'Add 100 demo players. Continue?'
+      ? `${demoToAdd} joueur(s) démo vont être ajoutés pour atteindre 100 actifs. Continuer ?`
+      : `${demoToAdd} demo player(s) will be added to reach 100 active. Continue?`
     )) return
     setAddingDemo(true)
     const res = await fetch('/api/admin/players', { method: 'PUT' })
@@ -184,6 +184,7 @@ export default function UsersClient({ players, profiles, currentProfile }: Props
 
   const activeCount = players.filter(p => p.is_active).length
   const inactiveCount = players.filter(p => !p.is_active).length
+  const demoToAdd = 100 - activeCount
 
   return (
     <div className="min-h-screen">
@@ -225,7 +226,7 @@ export default function UsersClient({ players, profiles, currentProfile }: Props
               className="btn-secondary text-sm"
               title={activeCount >= 100 ? (lang === 'fr' ? 'Maximum de 100 joueurs atteint' : 'Maximum 100 players reached') : ''}
             >
-              {addingDemo ? t.loading : `🎮 ${lang === 'fr' ? 'Équipe démo (100)' : 'Demo team (100)'}`}
+              {addingDemo ? t.loading : `🎮 ${lang === 'fr' ? `Compléter à 100 (+${demoToAdd})` : `Fill to 100 (+${demoToAdd})`}`}
             </button>
             {demoCount > 0 && (
               <button

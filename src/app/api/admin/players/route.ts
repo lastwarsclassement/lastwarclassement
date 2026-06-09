@@ -25,14 +25,22 @@ const DEMO_NAMES = [
   'BlazeMaster','FrostByte','ThunderBolt','SteelFang','AshKnight',
 ]
 
-// POST bulk: Add 100 demo players
+// PUT: Add demo players to fill up to 100 active
 export async function PUT(req: NextRequest) {
   const admin = await requireAdmin()
   if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const adminClient = getAdmin()
 
-  const demoPlayers = DEMO_NAMES.map((name, i) => ({
+  const { count: activeCount } = await adminClient
+    .from('players')
+    .select('*', { count: 'exact', head: true })
+    .eq('is_active', true)
+
+  const needed = Math.max(0, 100 - (activeCount ?? 0))
+  if (needed === 0) return NextResponse.json({ ok: true, count: 0 })
+
+  const demoPlayers = DEMO_NAMES.slice(0, needed).map((name, i) => ({
     username: `demo_${name.toLowerCase()}`,
     display_name: name,
     birth_date: `${1985 + (i % 25)}-${String((i % 12) + 1).padStart(2, '0')}-${String((i % 28) + 1).padStart(2, '0')}`,
