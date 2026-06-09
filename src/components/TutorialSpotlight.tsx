@@ -8,12 +8,14 @@ type Role = 'admin' | 'reader'
 interface TutorialState { active: boolean; role: Role; step: number }
 
 const KEY = 'lw_tutorial'
+const DONE_KEY = 'lw_tutorial_done'
 function loadState(): TutorialState | null {
   if (typeof window === 'undefined') return null
   try { return JSON.parse(localStorage.getItem(KEY) || 'null') } catch { return null }
 }
 function saveState(s: TutorialState) { localStorage.setItem(KEY, JSON.stringify(s)) }
-function clearState() { localStorage.removeItem(KEY) }
+function clearState() { localStorage.removeItem(KEY); localStorage.setItem(DONE_KEY, '1') }
+function isDone(): boolean { return typeof window !== 'undefined' && !!localStorage.getItem(DONE_KEY) }
 
 export function startTutorial(role: Role) {
   saveState({ active: true, role, step: 0 })
@@ -165,11 +167,15 @@ export default function TutorialSpotlight({ isAdmin, lang }: Props) {
 
   const steps = isAdmin ? ADMIN_STEPS : READER_STEPS
 
-  // Load on mount + listen for start event
+  // Load on mount + listen for start event + auto-start on first visit
   useEffect(() => {
     const load = () => {
       const s = loadState()
       setTut(s?.active ? s : null)
+    }
+    // Auto-start if never seen before
+    if (!isDone() && !loadState()?.active) {
+      startTutorial(isAdmin ? 'admin' : 'reader')
     }
     load()
     window.addEventListener('lw:tutorial', load)
