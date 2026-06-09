@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { TRANSLATIONS, Lang, getRankColor } from '@/lib/utils'
 import type { Profile, Week, Player, WeeklyRanking } from '@/types'
 import Navbar from './Navbar'
+import ProfileModal from './ProfileModal'
 
 interface Props {
   profile: Profile | null
@@ -17,8 +18,10 @@ export default function HistoryClient({ profile, weeks, players, rankings }: Pro
   const router = useRouter()
   const [lang, setLang] = useState<Lang>('fr')
   const [selectedWeekId, setSelectedWeekId] = useState<string>(weeks[0]?.id || '')
+  const [showProfile, setShowProfile] = useState(false)
   const t = TRANSLATIONS[lang]
 
+  const currentPlayer = players.find(p => p.id === profile?.player_id) ?? null
   const selectedRankings = selectedWeekId ? (rankings[selectedWeekId] || []) : []
   const selectedWeek = weeks.find(w => w.id === selectedWeekId)
 
@@ -28,7 +31,8 @@ export default function HistoryClient({ profile, weeks, players, rankings }: Pro
         lang={lang}
         setLang={setLang}
         isAdmin={profile?.role === 'admin'}
-        playerName={players.find(p => p.id === profile?.player_id)?.display_name}
+        playerName={currentPlayer?.display_name}
+        onProfile={() => setShowProfile(true)}
       />
 
       <div className="max-w-7xl mx-auto px-4 py-6">
@@ -127,6 +131,15 @@ export default function HistoryClient({ profile, weeks, players, rankings }: Pro
           </div>
         )}
       </div>
+
+      {showProfile && profile && (
+        <ProfileModal
+          profile={profile}
+          player={currentPlayer}
+          lang={lang}
+          onClose={() => setShowProfile(false)}
+        />
+      )}
     </div>
   )
 }
