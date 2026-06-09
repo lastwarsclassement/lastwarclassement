@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { TRANSLATIONS, Lang, getRankColor, getRankBg } from '@/lib/utils'
+import { TRANSLATIONS, Lang, getRankColor, getRankBg, getLocale } from '@/lib/utils'
 import { getBirthdaysInRange, getWeekDates, getNextBirthdayDate, computeContributionPoints } from '@/lib/scoring'
 import type { Player, Profile, Week, DailyScore, Sanction, WeeklyRanking, PlayerRole } from '@/types'
 import ScoreEntryModal from './ScoreEntryModal'
@@ -231,7 +231,7 @@ export default function DashboardClient({
                     )}
                   </p>
                   <p className="text-slate-400 text-sm mt-0.5">
-                    {new Date(activeWeek.start_date).toLocaleDateString('fr-FR')} → {new Date(activeWeek.end_date).toLocaleDateString('fr-FR')}
+                    {new Date(activeWeek.start_date).toLocaleDateString(getLocale(lang))} → {new Date(activeWeek.end_date).toLocaleDateString(getLocale(lang))}
                   </p>
                 </>
               ) : (

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { TRANSLATIONS, Lang, formatScore, parseScoreInput } from '@/lib/utils'
+import { TRANSLATIONS, Lang, formatScore, parseScoreInput, getLocale } from '@/lib/utils'
 import { isSunday } from '@/lib/scoring'
 import type { Player, Week, DailyScore } from '@/types'
 
@@ -147,7 +147,7 @@ export default function ScoreEntryModal({ players, week, existingScores, lang, o
         <p className="text-xs text-slate-400 mb-3">
           {sunday
             ? `📅 ${t.sunday} — ${t.contribScore}`
-            : `📅 ${new Date(selectedDate).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long' })} — ${t.vsScore}`
+            : `📅 ${new Date(selectedDate).toLocaleDateString(getLocale(lang), { weekday: 'long', day: 'numeric', month: 'long' })} — ${t.vsScore}`
           }
           {!sunday && week.type === 'eco' && getDow(selectedDate) <= 4 && (
             <span className="ml-2 text-amber-400">· Éco: classement par proximité à 7,2M</span>

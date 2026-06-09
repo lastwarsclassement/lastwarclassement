@@ -9,18 +9,17 @@ export function parseScoreInput(input: string): number {
   return isNaN(val) ? 0 : val
 }
 
-export function formatDate(dateStr: string, locale: 'fr' | 'en' = 'fr'): string {
-  return new Date(dateStr).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
+const LOCALES: Record<string, string> = { fr: 'fr-FR', en: 'en-US', es: 'es-ES', de: 'de-DE' }
+export function getLocale(lang: string): string { return LOCALES[lang] ?? 'en-US' }
+
+export function formatDate(dateStr: string, lang: string = 'fr'): string {
+  return new Date(dateStr).toLocaleDateString(getLocale(lang), {
+    day: '2-digit', month: '2-digit', year: 'numeric',
   })
 }
 
-export function getDayName(dateStr: string, locale: 'fr' | 'en' = 'fr'): string {
-  return new Date(dateStr).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', {
-    weekday: 'long',
-  })
+export function getDayName(dateStr: string, lang: string = 'fr'): string {
+  return new Date(dateStr).toLocaleDateString(getLocale(lang), { weekday: 'long' })
 }
 
 export function toEmailFormat(username: string): string {
@@ -40,6 +39,12 @@ export function getRankBg(rank: number): string {
   if (rank === 3) return 'bg-amber-600/10 border-amber-600/30'
   return ''
 }
+
+export type Lang = 'fr' | 'en' | 'es' | 'de'
+export type T = typeof TRANSLATIONS.fr
+
+export const LANG_CYCLE: Lang[] = ['fr', 'en', 'es', 'de']
+export const LANG_LABELS: Record<Lang, string> = { fr: 'FR', en: 'EN', es: 'ES', de: 'DE' }
 
 export const TRANSLATIONS = {
   fr: {
@@ -172,7 +177,134 @@ export const TRANSLATIONS = {
     role_reader: 'Reader',
     accountType: 'Account type',
   },
+  es: {
+    title: 'Clasificación Last War',
+    login: 'Iniciar sesión',
+    logout: 'Cerrar sesión',
+    username: 'Usuario',
+    password: 'Contraseña',
+    birthdate: 'Fecha de nacimiento',
+    showPassword: 'Mostrar',
+    hidePassword: 'Ocultar',
+    rank: 'Rango',
+    player: 'Jugador',
+    baseScore: 'Base',
+    dailyPts: 'Pts / Día',
+    contribPts: 'Dom.',
+    sanctionPts: 'Sanciones',
+    total: 'Total',
+    role: 'Rol',
+    pilot: 'Piloto de Tren',
+    vip: 'VIP',
+    weekType: 'Tipo de semana',
+    pushWeek: 'Semana Push',
+    ecoWeek: 'Semana Éco',
+    enterScores: 'Ingresar puntos',
+    contribution: 'Contribución de Alianza',
+    sanctions: 'Sanciones',
+    validateWeek: 'Validar semana',
+    createUser: 'Crear cuenta',
+    history: 'Historial',
+    dashboard: 'Clasificación',
+    admin: 'Admin',
+    save: 'Guardar',
+    cancel: 'Cancelar',
+    confirm: 'Confirmar',
+    close: 'Cerrar',
+    selectDate: 'Seleccionar fecha',
+    vsScore: 'Puntuación VS',
+    contribScore: 'Puntuación Contribución',
+    sunday: 'Domingo',
+    step: 'Paso',
+    top10: 'Top 10 (+10 pts)',
+    next10: 'Siguientes 10 (+6 pts)',
+    last10: 'Últimos 10 (+3 pts)',
+    sanctionMinus5: 'Sanción (-5 pts)',
+    weekNumber: 'Semana',
+    activeWeek: 'Semana activa',
+    noActiveWeek: 'Sin semana activa',
+    startWeek: 'Iniciar semana',
+    birthday: 'Cumpleaños',
+    birthdayNote: 'cumpleaños esta semana → plazas VIP reservadas',
+    pilotNote: 'Top 7 → Pilotos de Tren',
+    vipNote: 'Siguientes → VIP',
+    weekValidated: 'Semana validada',
+    reopenWeek: 'Reabrir semana',
+    selectAll: 'Seleccionar todo',
+    deselect: 'Deseleccionar',
+    loading: 'Cargando...',
+    error: 'Error',
+    success: 'Éxito',
+    weekHistory: 'Historial de semanas',
+    noHistory: 'Sin historial disponible',
+    displayName: 'Nombre mostrado',
+    role_admin: 'Administrador',
+    role_reader: 'Lector',
+    accountType: 'Tipo de cuenta',
+  },
+  de: {
+    title: 'Last War Rangliste',
+    login: 'Anmelden',
+    logout: 'Abmelden',
+    username: 'Benutzername',
+    password: 'Passwort',
+    birthdate: 'Geburtsdatum',
+    showPassword: 'Anzeigen',
+    hidePassword: 'Verbergen',
+    rank: 'Rang',
+    player: 'Spieler',
+    baseScore: 'Basis',
+    dailyPts: 'Pkt. / Tag',
+    contribPts: 'So.',
+    sanctionPts: 'Strafen',
+    total: 'Gesamt',
+    role: 'Rolle',
+    pilot: 'Zugpilot',
+    vip: 'VIP',
+    weekType: 'Wochentyp',
+    pushWeek: 'Push-Woche',
+    ecoWeek: 'Öko-Woche',
+    enterScores: 'Punkte eingeben',
+    contribution: 'Allianz-Beitrag',
+    sanctions: 'Strafen',
+    validateWeek: 'Woche validieren',
+    createUser: 'Konto erstellen',
+    history: 'Verlauf',
+    dashboard: 'Rangliste',
+    admin: 'Admin',
+    save: 'Speichern',
+    cancel: 'Abbrechen',
+    confirm: 'Bestätigen',
+    close: 'Schließen',
+    selectDate: 'Datum wählen',
+    vsScore: 'VS-Punkte',
+    contribScore: 'Beitragspunkte',
+    sunday: 'Sonntag',
+    step: 'Schritt',
+    top10: 'Top 10 (+10 Pkt.)',
+    next10: 'Nächste 10 (+6 Pkt.)',
+    last10: 'Letzte 10 (+3 Pkt.)',
+    sanctionMinus5: 'Strafe (-5 Pkt.)',
+    weekNumber: 'Woche',
+    activeWeek: 'Aktive Woche',
+    noActiveWeek: 'Keine aktive Woche',
+    startWeek: 'Woche starten',
+    birthday: 'Geburtstag',
+    birthdayNote: 'Geburtstag(e) diese Woche → VIP-Plätze reserviert',
+    pilotNote: 'Top 7 → Zugpiloten',
+    vipNote: 'Nächste → VIP',
+    weekValidated: 'Woche validiert',
+    reopenWeek: 'Woche wieder öffnen',
+    selectAll: 'Alle auswählen',
+    deselect: 'Abwählen',
+    loading: 'Laden...',
+    error: 'Fehler',
+    success: 'Erfolg',
+    weekHistory: 'Wochenverlauf',
+    noHistory: 'Kein Verlauf verfügbar',
+    displayName: 'Anzeigename',
+    role_admin: 'Administrator',
+    role_reader: 'Leser',
+    accountType: 'Kontotyp',
+  },
 }
-
-export type Lang = 'fr' | 'en'
-export type T = typeof TRANSLATIONS.fr

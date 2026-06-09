@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-
-type Lang = 'fr' | 'en'
+import type { Lang } from '@/lib/utils'
 type Role = 'admin' | 'reader'
 
 interface TutorialState { active: boolean; role: Role; step: number }

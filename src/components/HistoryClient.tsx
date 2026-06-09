@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { TRANSLATIONS, Lang, getRankColor } from '@/lib/utils'
+import { TRANSLATIONS, Lang, getRankColor, getLocale } from '@/lib/utils'
 import type { Profile, Week, Player, WeeklyRanking } from '@/types'
 import Navbar from './Navbar'
 import ProfileModal from './ProfileModal'
@@ -64,7 +64,7 @@ export default function HistoryClient({ profile, weeks, players, rankings }: Pro
               >
                 {weeks.map(w => (
                   <option key={w.id} value={w.id}>
-                    S{w.week_number} · {new Date(w.start_date + 'T00:00:00Z').toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US', { day: '2-digit', month: 'short' })} → {new Date(w.end_date + 'T00:00:00Z').toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US', { day: '2-digit', month: 'short' })} · {w.type === 'push' ? (lang === 'fr' ? 'Push' : 'Push') : 'Éco'}
+                    S{w.week_number} · {new Date(w.start_date + 'T00:00:00Z').toLocaleDateString(getLocale(lang), { day: '2-digit', month: 'short' })} → {new Date(w.end_date + 'T00:00:00Z').toLocaleDateString(getLocale(lang), { day: '2-digit', month: 'short' })} · {w.type === 'push' ? 'Push' : 'Éco'}
                   </option>
                 ))}
               </select>

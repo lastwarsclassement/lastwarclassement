@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { TRANSLATIONS, Lang } from '@/lib/utils'
+import { TRANSLATIONS, Lang, getLocale } from '@/lib/utils'
 import type { Player, Profile } from '@/types'
 import ProfileModal from './ProfileModal'
 import EditAccountModal from './EditAccountModal'
@@ -416,7 +416,7 @@ export default function UsersClient({ players, profiles, currentProfile }: Props
                         <span className="text-white font-medium">{player.display_name}</span>
                       </td>
                       <td className="px-4 py-3 text-slate-400 hidden md:table-cell">
-                        {new Date(player.birth_date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US')}
+                        {new Date(player.birth_date).toLocaleDateString(getLocale(lang))}
                       </td>
                       <td className="px-4 py-3 text-center">
                         <span className={`text-xs px-2 py-0.5 rounded-full border ${

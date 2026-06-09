@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { TRANSLATIONS, Lang } from '@/lib/utils'
+import { TRANSLATIONS, Lang, LANG_CYCLE, LANG_LABELS } from '@/lib/utils'
 import TutorialSpotlight, { startTutorial } from './TutorialSpotlight'
 
 interface NavbarProps {
@@ -66,13 +66,17 @@ export default function Navbar({ lang, setLang, isAdmin, playerName, onProfile }
               {t.history}
             </a>
 
-            {/* Lang toggle */}
+            {/* Lang cycle */}
             <button
-              onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}
+              onClick={() => {
+                const idx = LANG_CYCLE.indexOf(lang)
+                setLang(LANG_CYCLE[(idx + 1) % LANG_CYCLE.length])
+              }}
               className="text-xs hover:text-yellow-400 rounded-full px-2 py-1 transition-colors"
-              style={{ color: '#A8C4E8', border: '1px solid #2A4F8A' }}
+              style={{ color: '#A8C4E8', border: '1px solid #2A4F8A', minWidth: '34px' }}
+              title="Changer de langue / Change language"
             >
-              {lang === 'fr' ? 'EN' : 'FR'}
+              {LANG_LABELS[lang]}
             </button>
 
             {/* Tutorial button */}
