@@ -201,8 +201,8 @@ export default function UsersClient({ players, profiles, currentProfile }: Props
           <div className="flex items-center gap-1">
             <a href="/dashboard" style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.8rem', color: '#fff' }}
                className="px-3 py-1 transition-colors hover:text-yellow-400">{t.dashboard}</a>
-            <a href="/dashboard/users" style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.8rem', color: '#FFB800', textShadow: '0 0 12px rgba(255,184,0,0.6)' }}
-               className="px-3 py-1">{lang === 'fr' ? 'Joueurs' : 'Players'}</a>
+            <a href="/dashboard/users" style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.8rem', color: '#fff' }}
+               className="px-3 py-1 transition-colors hover:text-yellow-400">{lang === 'fr' ? 'Joueurs' : 'Players'}</a>
             <a href="/dashboard/history" style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.8rem', color: '#fff' }}
                className="px-3 py-1 transition-colors hover:text-yellow-400">{t.history}</a>
             <button
