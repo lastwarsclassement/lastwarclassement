@@ -95,6 +95,12 @@ export default function UsersClient({ players, profiles, currentProfile }: Props
   }
 
   async function handleToggleActive(player: Player) {
+    if (player.is_active) {
+      const msg = lang === 'fr'
+        ? `Désactiver "${player.display_name}" ? Il sera retiré du classement en cours. Ses données seront conservées.`
+        : `Disable "${player.display_name}"? They will be removed from the current leaderboard. Their data will be preserved.`
+      if (!confirm(msg)) return
+    }
     const res = await fetch('/api/admin/players', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },

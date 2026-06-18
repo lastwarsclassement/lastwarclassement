@@ -4,7 +4,16 @@ export function formatScore(score: number): string {
 }
 
 export function parseScoreInput(input: string): number {
-  const clean = input.replace(/\s/g, '')
+  const clean = input.trim().replace(/\s/g, '').toUpperCase()
+  if (!clean) return 0
+  if (clean.endsWith('M')) {
+    const val = parseFloat(clean.slice(0, -1))
+    return isNaN(val) ? 0 : Math.round(val * 1_000_000)
+  }
+  if (clean.endsWith('K')) {
+    const val = parseFloat(clean.slice(0, -1))
+    return isNaN(val) ? 0 : Math.round(val * 1_000)
+  }
   const val = parseInt(clean, 10)
   return isNaN(val) ? 0 : val
 }

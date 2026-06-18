@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
       vs_score: null,
       contribution_score: e.score,
       points_earned: 0,
+      week_type: weekType,
     }))
     const { error } = await db.from('daily_scores').upsert(upserts, { onConflict: 'week_id,player_id,score_date' })
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
@@ -41,6 +42,7 @@ export async function POST(req: NextRequest) {
     vs_score: e.score,
     contribution_score: null,
     points_earned: pointsMap.get(e.player_id) ?? 0,
+    week_type: weekType,
   }))
 
   const { error } = await db.from('daily_scores').upsert(upserts, { onConflict: 'week_id,player_id,score_date' })

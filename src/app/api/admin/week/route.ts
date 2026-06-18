@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdmin, requireAdmin } from '@/lib/admin'
-import { getCurrentWeekNumber, getCurrentWeekStart, getWeekDates, computeBatchPoints } from '@/lib/scoring'
-import type { WeekType } from '@/types'
+import { getCurrentWeekNumber, getCurrentWeekStart, getWeekDates } from '@/lib/scoring'
 
 // POST: Start a new week
 export async function POST(req: NextRequest) {
@@ -99,29 +98,6 @@ export async function PATCH(req: NextRequest) {
 
   const { error } = await db.from('weeks').update(update).eq('id', weekId)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-
-  if (type) {
-    const { data: scores } = await db
-      .from('daily_scores').select('id, player_id, score_date, vs_score')
-      .eq('week_id', weekId).not('vs_score', 'is', null)
-
-    if (scores?.length) {
-      const byDate = new Map<string, { id: string; player_id: string; vs_score: number }[]>()
-      for (const s of scores) {
-        if (!byDate.has(s.score_date)) byDate.set(s.score_date, [])
-        byDate.get(s.score_date)!.push({ id: s.id, player_id: s.player_id, vs_score: s.vs_score })
-      }
-      for (const [date, entries] of byDate) {
-        const pointsMap = computeBatchPoints(
-          entries.map(e => ({ player_id: e.player_id, vs_score: e.vs_score })),
-          type as WeekType, date
-        )
-        for (const entry of entries) {
-          await db.from('daily_scores').update({ points_earned: pointsMap.get(entry.player_id) ?? 0 }).eq('id', entry.id)
-        }
-      }
-    }
-  }
 
   return NextResponse.json({ ok: true })
 }

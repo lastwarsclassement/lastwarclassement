@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { getAdmin } from '@/lib/admin'
 import { redirect } from 'next/navigation'
 import HistoryClient from '@/components/HistoryClient'
 import type { WeeklyRanking } from '@/types'
@@ -10,19 +11,21 @@ export default async function HistoryPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const db = getAdmin()
+
   const [
     { data: profile },
     { data: weeks },
     { data: players },
   ] = await Promise.all([
-    supabase.from('profiles').select('*').eq('id', user.id).single(),
-    supabase.from('weeks').select('*').eq('status', 'validated').order('year', { ascending: false }).order('week_number', { ascending: false }),
-    supabase.from('players').select('*').eq('is_active', true),
+    db.from('profiles').select('*').eq('id', user.id).single(),
+    db.from('weeks').select('*').eq('status', 'validated').order('year', { ascending: false }).order('week_number', { ascending: false }),
+    db.from('players').select('*').eq('is_active', true),
   ])
 
   let rankings: Record<string, WeeklyRanking[]> = {}
   if (weeks && weeks.length > 0) {
-    const { data: allRankings } = await supabase
+    const { data: allRankings } = await db
       .from('weekly_rankings')
       .select('*')
       .in('week_id', weeks.map(w => w.id))

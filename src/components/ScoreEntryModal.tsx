@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { TRANSLATIONS, Lang, formatScore, parseScoreInput, getLocale } from '@/lib/utils'
 import { isSunday } from '@/lib/scoring'
-import type { Player, Week, DailyScore } from '@/types'
+import type { Player, Week, DailyScore, WeekType } from '@/types'
 
 interface Props {
   players: Player[]
@@ -25,7 +25,6 @@ export default function ScoreEntryModal({ players, week, existingScores, lang, o
   )
 
   const todayUTC = new Date().toISOString().split('T')[0]
-  // Clamp default date to the week's range
   const defaultDate = weekDaysEarly.includes(todayUTC)
     ? todayUTC
     : (todayUTC < weekDaysEarly[0] ? weekDaysEarly[0] : weekDaysEarly[5])
@@ -48,6 +47,13 @@ export default function ScoreEntryModal({ players, week, existingScores, lang, o
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+
+  // Returns the week_type that was stored when scores for this date were last saved.
+  // Falls back to the current week type for new dates or legacy data without stored type.
+  function getDateType(date: string): WeekType {
+    const scoreWithType = existingScores.find(s => s.score_date === date && s.week_type != null)
+    return (scoreWithType?.week_type as WeekType) ?? week.type
+  }
 
   const sunday = isSunday(selectedDate)
 
@@ -76,12 +82,16 @@ export default function ScoreEntryModal({ players, week, existingScores, lang, o
       score: parseScoreInput(scores[p.id] || '0'),
     })).filter(e => e.score > 0)
 
+    // For re-entries, preserve the original week_type so points aren't recalculated
+    // with a different mode than when they were first entered.
+    const dateType = sunday ? week.type : getDateType(selectedDate)
+
     const res = await fetch('/api/admin/scores', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         weekId: week.id,
-        weekType: week.type,
+        weekType: dateType,
         date: selectedDate,
         isSunday: sunday,
         entries,
@@ -111,6 +121,11 @@ export default function ScoreEntryModal({ players, week, existingScores, lang, o
 
   const filledCount = Object.values(scores).filter(v => v && parseScoreInput(v) > 0).length
 
+  // Detect type conflict: existing scores for this date used a different mode
+  const dateType = getDateType(selectedDate)
+  const hasOriginalType = !sunday && existingScores.some(s => s.score_date === selectedDate && s.week_type != null)
+  const typeConflict = hasOriginalType && dateType !== week.type
+
   return (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal-box max-w-3xl fade-in">
@@ -125,6 +140,7 @@ export default function ScoreEntryModal({ players, week, existingScores, lang, o
             const dow = getDow(d)
             const isSun = dow === 7
             const hasScores = existingScores.some(s => s.score_date === d && (s.vs_score || s.contribution_score))
+            const dType = getDateType(d)
             return (
               <button
                 key={d}
@@ -139,10 +155,25 @@ export default function ScoreEntryModal({ players, week, existingScores, lang, o
                 <div className="text-xs opacity-70">{d.slice(8)}</div>
                 {hasScores && <div className="text-xs mt-0.5">✓</div>}
                 {isSun && <div className="text-xs">🤝</div>}
+                {!isSun && (
+                  <div style={{ fontSize: '0.5rem', opacity: 0.55, marginTop: '1px', color: dType === 'push' ? '#FFB800' : '#34D399' }}>
+                    {dType === 'push' ? '▲P' : '●É'}
+                  </div>
+                )}
               </button>
             )
           })}
         </div>
+
+        {/* Warning: re-entry under a different week type than current */}
+        {typeConflict && (
+          <div className="mb-3 bg-amber-500/10 border border-amber-500/30 rounded-lg px-3 py-2 text-amber-300 text-xs">
+            {lang === 'fr'
+              ? `⚠️ Ce jour a été saisi en mode ${dateType === 'push' ? 'Push' : 'Éco'} — les points seront recalculés en ${dateType === 'push' ? 'Push' : 'Éco'} (mode d'origine conservé).`
+              : `⚠️ This day was originally entered in ${dateType === 'push' ? 'Push' : 'Eco'} mode — points will use ${dateType === 'push' ? 'Push' : 'Eco'} (original mode preserved).`
+            }
+          </div>
+        )}
 
         <p className="text-xs text-slate-400 mb-3">
           {sunday
@@ -156,7 +187,7 @@ export default function ScoreEntryModal({ players, week, existingScores, lang, o
         </p>
 
         <p className="text-xs text-slate-500 mb-4">
-          {lang === 'fr' ? 'Format : 7 200 000' : 'Format: 7 200 000'}
+          {lang === 'fr' ? 'Format : 7 200 000 · 7.2M · 7200K' : 'Format: 7 200 000 · 7.2M · 7200K'}
         </p>
 
         {/* Score inputs */}

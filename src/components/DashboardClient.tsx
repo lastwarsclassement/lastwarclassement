@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { TRANSLATIONS, Lang, getRankColor, getRankBg, getLocale } from '@/lib/utils'
 import { getBirthdaysInRange, getWeekDates, getNextBirthdayDate, computeContributionPoints } from '@/lib/scoring'
-import type { Player, Profile, Week, DailyScore, Sanction, WeeklyRanking, PlayerRole } from '@/types'
+import type { Player, Profile, Week, DailyScore, Sanction, WeeklyRanking, PlayerRole, WeekType } from '@/types'
 import ScoreEntryModal from './ScoreEntryModal'
 import SanctionModal from './SanctionModal'
 import WeekValidationModal from './WeekValidationModal'
@@ -138,6 +138,16 @@ export default function DashboardClient({
     )
   }, [activeWeek])
 
+  // Per-day week type: inferred from stored week_type in daily_scores
+  const dayTypes = useMemo(() => {
+    const types: Record<string, WeekType> = {}
+    for (const day of weekDays) {
+      const scoreWithType = dailyScores.find(ds => ds.score_date === day && ds.week_type != null)
+      types[day] = (scoreWithType?.week_type as WeekType) ?? (activeWeek?.type ?? 'push')
+    }
+    return types
+  }, [weekDays, dailyScores, activeWeek])
+
   const dayLabels = lang === 'fr'
     ? ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
     : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -253,7 +263,12 @@ export default function DashboardClient({
                     disabled={weekTypeLoading}
                     className="btn-secondary text-sm"
                   >
-                    {weekTypeLoading ? '...' : activeWeek.type === 'push' ? `⇄ ${t.ecoWeek}` : `⇄ ${t.pushWeek}`}
+                    {weekTypeLoading
+                      ? '...'
+                      : activeWeek.type === 'push'
+                        ? '⇄ Push → Éco'
+                        : '⇄ Éco → Push'
+                    }
                   </button>
                 </div>
               )}
@@ -330,8 +345,13 @@ export default function DashboardClient({
                   <tr>
                     <th className="table-th w-12">{t.rank}</th>
                     <th className="table-th">{t.player}</th>
-                    {weekDays.map((_, i) => (
-                      <th key={i} className="table-th-center w-12">{dayLabels[i]}</th>
+                    {weekDays.map((day, i) => (
+                      <th key={i} className="table-th-center w-12">
+                        <div>{dayLabels[i]}</div>
+                        <div style={{ fontSize: '0.5rem', letterSpacing: '0.02em', opacity: 0.45, color: dayTypes[day] === 'push' ? '#FFB800' : '#34D399' }}>
+                          {dayTypes[day] === 'push' ? 'P' : 'É'}
+                        </div>
+                      </th>
                     ))}
                     <th className="table-th-center">{t.contribPts}</th>
                     <th className="table-th-center">{t.sanctionPts}</th>

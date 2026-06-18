@@ -39,6 +39,7 @@ export interface DailyScore {
   vs_score: number | null
   contribution_score: number | null
   points_earned: number
+  week_type: WeekType | null
   created_at: string
 }
 
