@@ -31,6 +31,7 @@ CREATE TABLE weeks (
   end_date DATE NOT NULL,
   type TEXT NOT NULL CHECK (type IN ('push', 'eco')) DEFAULT 'push',
   status TEXT NOT NULL CHECK (status IN ('active', 'validated')) DEFAULT 'active',
+  frozen_dates DATE[] NOT NULL DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT now(),
   UNIQUE(week_number, year)
 );
@@ -44,7 +45,7 @@ CREATE TABLE daily_scores (
   vs_score BIGINT,
   contribution_score BIGINT,
   points_earned INTEGER NOT NULL DEFAULT 0,
-  week_type TEXT CHECK (week_type IN ('push', 'eco')),
+  week_type TEXT CHECK (week_type IN ('push', 'eco', 'gel')),
   created_at TIMESTAMPTZ DEFAULT now(),
   UNIQUE(week_id, player_id, score_date)
 );
@@ -183,3 +184,12 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+
+-- ============================================================
+-- MIGRATION : jours "gel" (à exécuter sur une base existante)
+-- ============================================================
+
+ALTER TABLE weeks ADD COLUMN IF NOT EXISTS frozen_dates DATE[] NOT NULL DEFAULT '{}';
+
+ALTER TABLE daily_scores DROP CONSTRAINT IF EXISTS daily_scores_week_type_check;
+ALTER TABLE daily_scores ADD CONSTRAINT daily_scores_week_type_check CHECK (week_type IN ('push', 'eco', 'gel'));

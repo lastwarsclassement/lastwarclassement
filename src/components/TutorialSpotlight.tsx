@@ -70,8 +70,8 @@ const ADMIN_STEPS: Step[] = [
   {
     icon: '📊', page: '/dashboard', target: 'enter-scores-btn',
     title: 'Saisir les scores', titleEn: 'Enter Scores',
-    body: 'Ce bouton ouvre la saisie des scores journaliers.\n\n• **Lun → Sam** : score VS (ex : 7.2M, 15000K, 25000000)\n• **Dimanche** : score de Contribution d\'Alliance\n  → Rang 1–10 : **+10 pts** · 11–20 : **+6 pts** · 21–30 : **+3 pts**\n\nLes cases ✓ indiquent les jours déjà renseignés (modifiables).',
-    bodyEn: 'This button opens the daily score entry modal.\n\n• **Mon → Sat**: VS score (e.g. 7.2M, 15000K, 25000000)\n• **Sunday**: Alliance Contribution score\n  → Rank 1–10: **+10 pts** · 11–20: **+6 pts** · 21–30: **+3 pts**\n\n✓ markers show already-entered days (editable).',
+    body: 'Ce bouton ouvre la saisie des scores journaliers.\n\n• **Lun → Sam** : score VS (ex : 7.2M, 15000K, 25000000)\n• **Dimanche** : score de Contribution d\'Alliance\n  → Rang 1–10 : **+10 pts** · 11–20 : **+6 pts** · 21–30 : **+3 pts**\n\nLes cases ✓ indiquent les jours déjà renseignés (modifiables).\n\n🧊 À côté de la date sélectionnée, le bouton **Geler ce jour** transforme ce jour (Push ou Éco) en jour Gel : score < 7,2M → -3 pts, sinon 0 pt. Réversible, recalcule aussitôt les points déjà saisis.',
+    bodyEn: 'This button opens the daily score entry modal.\n\n• **Mon → Sat**: VS score (e.g. 7.2M, 15000K, 25000000)\n• **Sunday**: Alliance Contribution score\n  → Rank 1–10: **+10 pts** · 11–20: **+6 pts** · 21–30: **+3 pts**\n\n✓ markers show already-entered days (editable).\n\n🧊 Next to the selected date, the **Freeze this day** button turns that day (Push or Eco) into a Frozen day: score < 7.2M → -3 pts, otherwise 0 pt. Reversible, immediately recalculates points already entered.',
   },
   {
     icon: '⚠️', page: '/dashboard', target: 'sanctions-btn',

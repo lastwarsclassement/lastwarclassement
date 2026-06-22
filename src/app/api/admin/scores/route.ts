@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdmin, requireAdmin } from '@/lib/admin'
 import { computeBatchPoints } from '@/lib/scoring'
-import type { WeekType } from '@/types'
+import type { DayType } from '@/types'
 
 export async function POST(req: NextRequest) {
   const user = await requireAdmin()
@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
 
   const { weekId, weekType, date, isSunday, entries } = await req.json() as {
     weekId: string
-    weekType: WeekType
+    weekType: DayType
     date: string
     isSunday: boolean
     entries: { player_id: string; score: number }[]

@@ -1,4 +1,4 @@
-import type { WeekType } from '@/types'
+import type { DayType } from '@/types'
 
 export function getDayOfWeek(date: Date): number {
   const d = date.getUTCDay()
@@ -23,13 +23,17 @@ export function calculateEcoRanks(
 
 export function calculatePoints(
   vsScore: number,
-  weekType: WeekType,
+  weekType: DayType,
   dateStr: string,
   ecoRank?: number
 ): number {
   const dow = getDayOfWeek(new Date(dateStr + 'T00:00:00Z'))
 
   if (dow === 7) return 0
+
+  if (weekType === 'gel') {
+    return vsScore < 7_200_000 ? -3 : 0
+  }
 
   if (weekType === 'push') {
     if (vsScore < 7_200_000) return -3
@@ -62,7 +66,7 @@ export function calculatePoints(
 
 export function computeBatchPoints(
   entries: { player_id: string; vs_score: number }[],
-  weekType: WeekType,
+  weekType: DayType,
   dateStr: string
 ): Map<string, number> {
   const dow = getDayOfWeek(new Date(dateStr + 'T00:00:00Z'))

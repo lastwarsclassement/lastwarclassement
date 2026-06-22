@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { TRANSLATIONS, Lang, formatScore, parseScoreInput, getLocale } from '@/lib/utils'
 import { isSunday } from '@/lib/scoring'
-import type { Player, Week, DailyScore, WeekType } from '@/types'
+import type { Player, Week, DailyScore, DayType } from '@/types'
 
 interface Props {
   players: Player[]
@@ -12,10 +12,12 @@ interface Props {
   lang: Lang
   onClose: () => void
   onSaved: () => void
+  onRefresh: () => void
 }
 
-export default function ScoreEntryModal({ players, week, existingScores, lang, onClose, onSaved }: Props) {
+export default function ScoreEntryModal({ players, week, existingScores, lang, onClose, onSaved, onRefresh }: Props) {
   const t = TRANSLATIONS[lang]
+  const [freezing, setFreezing] = useState(false)
 
   // Only allow dates within the current week (UTC)
   const start = new Date(week.start_date + 'T00:00:00Z')
@@ -48,14 +50,33 @@ export default function ScoreEntryModal({ players, week, existingScores, lang, o
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
-  // Returns the week_type that was stored when scores for this date were last saved.
-  // Falls back to the current week type for new dates or legacy data without stored type.
-  function getDateType(date: string): WeekType {
+  // Returns the effective day type: frozen dates always win, otherwise the type
+  // stored when scores for this date were last saved, falling back to the week type.
+  function getDateType(date: string): DayType {
+    if (week.frozen_dates?.includes(date)) return 'gel'
     const scoreWithType = existingScores.find(s => s.score_date === date && s.week_type != null)
-    return (scoreWithType?.week_type as WeekType) ?? week.type
+    return (scoreWithType?.week_type as DayType) ?? week.type
   }
 
   const sunday = isSunday(selectedDate)
+  const isFrozen = week.frozen_dates?.includes(selectedDate) ?? false
+
+  async function handleToggleFreeze() {
+    setFreezing(true)
+    setError('')
+    const res = await fetch('/api/admin/freeze-day', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ weekId: week.id, date: selectedDate, freeze: !isFrozen }),
+    })
+    if (!res.ok) {
+      const data = await res.json()
+      setError(data.error || t.error)
+    } else {
+      onRefresh()
+    }
+    setFreezing(false)
+  }
 
   function handleDateChange(date: string) {
     setSelectedDate(date)
@@ -121,10 +142,13 @@ export default function ScoreEntryModal({ players, week, existingScores, lang, o
 
   const filledCount = Object.values(scores).filter(v => v && parseScoreInput(v) > 0).length
 
+  const dayTypeLabel = (dt: DayType, l: Lang) =>
+    dt === 'push' ? (l === 'fr' ? 'Push' : 'Push') : dt === 'eco' ? (l === 'fr' ? 'Éco' : 'Eco') : (l === 'fr' ? 'Gel' : 'Freeze')
+
   // Detect type conflict: existing scores for this date used a different mode
   const dateType = getDateType(selectedDate)
   const hasOriginalType = !sunday && existingScores.some(s => s.score_date === selectedDate && s.week_type != null)
-  const typeConflict = hasOriginalType && dateType !== week.type
+  const typeConflict = !isFrozen && hasOriginalType && dateType !== week.type
 
   return (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
@@ -156,8 +180,8 @@ export default function ScoreEntryModal({ players, week, existingScores, lang, o
                 {hasScores && <div className="text-xs mt-0.5">✓</div>}
                 {isSun && <div className="text-xs">🤝</div>}
                 {!isSun && (
-                  <div style={{ fontSize: '0.5rem', opacity: 0.55, marginTop: '1px', color: dType === 'push' ? '#FFB800' : '#34D399' }}>
-                    {dType === 'push' ? '▲P' : '●É'}
+                  <div style={{ fontSize: '0.5rem', opacity: 0.55, marginTop: '1px', color: dType === 'push' ? '#FFB800' : dType === 'eco' ? '#34D399' : '#7DD3FC' }}>
+                    {dType === 'push' ? '▲P' : dType === 'eco' ? '●É' : '🧊G'}
                   </div>
                 )}
               </button>
@@ -169,21 +193,45 @@ export default function ScoreEntryModal({ players, week, existingScores, lang, o
         {typeConflict && (
           <div className="mb-3 bg-amber-500/10 border border-amber-500/30 rounded-lg px-3 py-2 text-amber-300 text-xs">
             {lang === 'fr'
-              ? `⚠️ Ce jour a été saisi en mode ${dateType === 'push' ? 'Push' : 'Éco'} — les points seront recalculés en ${dateType === 'push' ? 'Push' : 'Éco'} (mode d'origine conservé).`
-              : `⚠️ This day was originally entered in ${dateType === 'push' ? 'Push' : 'Eco'} mode — points will use ${dateType === 'push' ? 'Push' : 'Eco'} (original mode preserved).`
+              ? `⚠️ Ce jour a été saisi en mode ${dayTypeLabel(dateType, lang)} — les points seront recalculés en ${dayTypeLabel(dateType, lang)} (mode d'origine conservé).`
+              : `⚠️ This day was originally entered in ${dayTypeLabel(dateType, lang)} mode — points will use ${dayTypeLabel(dateType, lang)} (original mode preserved).`
             }
           </div>
         )}
 
-        <p className="text-xs text-slate-400 mb-3">
-          {sunday
-            ? `📅 ${t.sunday} — ${t.contribScore}`
-            : `📅 ${new Date(selectedDate).toLocaleDateString(getLocale(lang), { weekday: 'long', day: 'numeric', month: 'long' })} — ${t.vsScore}`
-          }
-          {!sunday && week.type === 'eco' && getDow(selectedDate) <= 4 && (
-            <span className="ml-2 text-amber-400">· Éco: classement par proximité à 7,2M</span>
+        {isFrozen && (
+          <div className="mb-3 bg-sky-500/10 border border-sky-500/30 rounded-lg px-3 py-2 text-sky-300 text-xs">
+            {lang === 'fr'
+              ? '🧊 Jour gelé — règle unique : score < 7 200 000 → -3 pts, sinon 0 pt.'
+              : '🧊 Frozen day — single rule: score < 7,200,000 → -3 pts, otherwise 0 pt.'
+            }
+          </div>
+        )}
+
+        <p className="text-xs text-slate-400 mb-3 flex items-center flex-wrap gap-2">
+          <span>
+            {sunday
+              ? `📅 ${t.sunday} — ${t.contribScore}`
+              : `📅 ${new Date(selectedDate).toLocaleDateString(getLocale(lang), { weekday: 'long', day: 'numeric', month: 'long' })} — ${t.vsScore}`
+            }
+            {!sunday && !isFrozen && week.type === 'eco' && getDow(selectedDate) <= 4 && (
+              <span className="ml-2 text-amber-400">· Éco: classement par proximité à 7,2M</span>
+            )}
+            <span className="ml-3 text-slate-500">{filledCount}/{players.length} saisis</span>
+          </span>
+          {!sunday && (
+            <button
+              onClick={handleToggleFreeze}
+              disabled={freezing}
+              className={`text-xs px-2 py-1 rounded-md border transition-all ${
+                isFrozen
+                  ? 'bg-sky-400/10 border-sky-400/40 text-sky-300 hover:bg-sky-400/20'
+                  : 'bg-slate-800 border-slate-700 text-slate-300 hover:border-sky-400/50'
+              }`}
+            >
+              {freezing ? t.loading : isFrozen ? `🔥 ${t.unfreezeDay}` : `🧊 ${t.freezeDay}`}
+            </button>
           )}
-          <span className="ml-3 text-slate-500">{filledCount}/{players.length} saisis</span>
         </p>
 
         <p className="text-xs text-slate-500 mb-4">

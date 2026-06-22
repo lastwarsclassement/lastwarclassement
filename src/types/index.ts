@@ -1,5 +1,6 @@
 export type UserRole = 'admin' | 'reader'
 export type WeekType = 'push' | 'eco'
+export type DayType = WeekType | 'gel'
 export type WeekStatus = 'active' | 'validated'
 export type PlayerRole = 'pilot' | 'vip' | null
 
@@ -28,6 +29,7 @@ export interface Week {
   end_date: string
   type: WeekType
   status: WeekStatus
+  frozen_dates: string[]
   created_at: string
 }
 
@@ -39,7 +41,7 @@ export interface DailyScore {
   vs_score: number | null
   contribution_score: number | null
   points_earned: number
-  week_type: WeekType | null
+  week_type: DayType | null
   created_at: string
 }
 

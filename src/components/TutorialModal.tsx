@@ -85,6 +85,16 @@ const ADMIN_STEPS: Step[] = [
     pageEn: 'Dashboard — 📊 Enter scores',
   },
   {
+    icon: '🧊',
+    title: 'Geler un jour',
+    titleEn: 'Freeze a Day',
+    body: 'Dans la saisie des scores, le bouton **🧊 Geler ce jour** (à côté de la date sélectionnée) permet de transformer n\'importe quel jour de la semaine (Push ou Éco, sauf dimanche) en jour **Gel**.\n\nRègle unique d\'un jour gelé :\n→ Score < 7,2M : **-3 pts** · Score ≥ 7,2M : **0 pt** (aucun bonus)\n\nLe gel est réversible (**🔥 Dégeler ce jour**) et recalcule immédiatement les points déjà saisis ce jour-là. Le badge du jour passe à 🧊 dans le tableau de classement.',
+    bodyEn: 'In the score entry modal, the **🧊 Freeze this day** button (next to the selected date) turns any day of the week (Push or Eco, except Sunday) into a **Frozen** day.\n\nSingle rule for a frozen day:\n→ Score < 7.2M: **-3 pts** · Score ≥ 7.2M: **0 pt** (no bonus)\n\nFreezing is reversible (**🔥 Unfreeze this day**) and immediately recalculates points already entered that day. The day badge becomes 🧊 in the leaderboard.',
+    pageUrl: '/dashboard',
+    pageFr: 'Dashboard — 📊 Saisir les scores',
+    pageEn: 'Dashboard — 📊 Enter scores',
+  },
+  {
     icon: '⚠️',
     title: 'Appliquer des sanctions',
     titleEn: 'Apply Sanctions',

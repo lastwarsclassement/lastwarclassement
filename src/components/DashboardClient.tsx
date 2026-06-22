@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { TRANSLATIONS, Lang, getRankColor, getRankBg, getLocale } from '@/lib/utils'
 import { getBirthdaysInRange, getWeekDates, getNextBirthdayDate, computeContributionPoints } from '@/lib/scoring'
-import type { Player, Profile, Week, DailyScore, Sanction, WeeklyRanking, PlayerRole, WeekType } from '@/types'
+import type { Player, Profile, Week, DailyScore, Sanction, WeeklyRanking, PlayerRole, DayType } from '@/types'
 import ScoreEntryModal from './ScoreEntryModal'
 import SanctionModal from './SanctionModal'
 import WeekValidationModal from './WeekValidationModal'
@@ -138,12 +138,16 @@ export default function DashboardClient({
     )
   }, [activeWeek])
 
-  // Per-day week type: inferred from stored week_type in daily_scores
+  // Per-day type: frozen dates win, otherwise inferred from stored week_type in daily_scores
   const dayTypes = useMemo(() => {
-    const types: Record<string, WeekType> = {}
+    const types: Record<string, DayType> = {}
     for (const day of weekDays) {
+      if (activeWeek?.frozen_dates?.includes(day)) {
+        types[day] = 'gel'
+        continue
+      }
       const scoreWithType = dailyScores.find(ds => ds.score_date === day && ds.week_type != null)
-      types[day] = (scoreWithType?.week_type as WeekType) ?? (activeWeek?.type ?? 'push')
+      types[day] = (scoreWithType?.week_type as DayType) ?? (activeWeek?.type ?? 'push')
     }
     return types
   }, [weekDays, dailyScores, activeWeek])
@@ -348,8 +352,8 @@ export default function DashboardClient({
                     {weekDays.map((day, i) => (
                       <th key={i} className="table-th-center w-12">
                         <div>{dayLabels[i]}</div>
-                        <div style={{ fontSize: '0.5rem', letterSpacing: '0.02em', opacity: 0.45, color: dayTypes[day] === 'push' ? '#FFB800' : '#34D399' }}>
-                          {dayTypes[day] === 'push' ? 'P' : 'É'}
+                        <div style={{ fontSize: '0.5rem', letterSpacing: '0.02em', opacity: 0.45, color: dayTypes[day] === 'push' ? '#FFB800' : dayTypes[day] === 'eco' ? '#34D399' : '#7DD3FC' }}>
+                          {dayTypes[day] === 'push' ? 'P' : dayTypes[day] === 'eco' ? 'É' : '🧊'}
                         </div>
                       </th>
                     ))}
@@ -439,6 +443,7 @@ export default function DashboardClient({
           lang={lang}
           onClose={() => setShowScoreEntry(false)}
           onSaved={() => { setShowScoreEntry(false); router.refresh() }}
+          onRefresh={() => router.refresh()}
         />
       )}
 
