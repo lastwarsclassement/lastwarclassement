@@ -21,16 +21,37 @@ export default function HistoryClient({ profile, weeks, players, rankings }: Pro
   const [showProfile, setShowProfile] = useState(false)
   const t = TRANSLATIONS[lang]
 
+  const [deleting, setDeleting] = useState(false)
+
+  const isAdmin = profile?.role === 'admin'
   const currentPlayer = players.find(p => p.id === profile?.player_id) ?? null
   const selectedRankings = selectedWeekId ? (rankings[selectedWeekId] || []) : []
   const selectedWeek = weeks.find(w => w.id === selectedWeekId)
+
+  async function handleDeleteWeek() {
+    if (!selectedWeek) return
+    const msg = lang === 'fr'
+      ? `Supprimer la semaine ${selectedWeek.week_number} (${selectedWeek.year}) et toutes ses données ? Cette action est irréversible.`
+      : `Delete week ${selectedWeek.week_number} (${selectedWeek.year}) and all its data? This cannot be undone.`
+    if (!confirm(msg)) return
+
+    setDeleting(true)
+    await fetch('/api/admin/week', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ weekId: selectedWeek.id }),
+    })
+    setDeleting(false)
+    setSelectedWeekId('')
+    router.refresh()
+  }
 
   return (
     <div className="min-h-screen">
       <Navbar
         lang={lang}
         setLang={setLang}
-        isAdmin={profile?.role === 'admin'}
+        isAdmin={isAdmin}
         playerName={currentPlayer?.display_name}
         onProfile={() => setShowProfile(true)}
       />
@@ -84,6 +105,15 @@ export default function HistoryClient({ profile, weeks, players, rankings }: Pro
                   }`}>
                     {selectedWeek.type === 'push' ? t.pushWeek : t.ecoWeek}
                   </span>
+                  {isAdmin && (
+                    <button
+                      onClick={handleDeleteWeek}
+                      disabled={deleting}
+                      className="btn-danger text-xs py-1 ml-auto"
+                    >
+                      🗑 {deleting ? t.loading : (lang === 'fr' ? 'Supprimer' : 'Delete')}
+                    </button>
+                  )}
                 </div>
               )}
               <div className="overflow-x-auto">

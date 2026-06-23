@@ -81,6 +81,35 @@ export async function DELETE(req: NextRequest) {
   const { error } = await db.from('weeks').delete().eq('id', weekId)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
+  // The active week's base scores may have come from the week we just deleted.
+  // Recompute them from the most recent validated week that still exists (or 0 if none).
+  const { data: activeWeek } = await db.from('weeks').select('id').eq('status', 'active').maybeSingle()
+
+  if (activeWeek) {
+    const { data: lastValidated } = await db
+      .from('weeks').select('id').eq('status', 'validated')
+      .order('year', { ascending: false }).order('week_number', { ascending: false })
+      .limit(1).maybeSingle()
+
+    const baseScoreMap = new Map<string, number>()
+    if (lastValidated) {
+      const { data: rankings } = await db
+        .from('weekly_rankings').select('player_id, base_score_next_week').eq('week_id', lastValidated.id)
+      rankings?.forEach(r => baseScoreMap.set(r.player_id, r.base_score_next_week))
+    }
+
+    const { data: currentBases } = await db
+      .from('player_week_base').select('player_id').eq('week_id', activeWeek.id)
+
+    if (currentBases?.length) {
+      await Promise.all(currentBases.map(b =>
+        db.from('player_week_base')
+          .update({ base_score: baseScoreMap.get(b.player_id) ?? 0 })
+          .eq('week_id', activeWeek.id).eq('player_id', b.player_id)
+      ))
+    }
+  }
+
   return NextResponse.json({ ok: true })
 }
 
