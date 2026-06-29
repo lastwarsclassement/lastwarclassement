@@ -104,7 +104,7 @@ export default function WeekValidationModal({ players, week, rows, lang, onClose
   }
 
   function getBaseScoreNextWeek(playerId: string, totalPoints: number): number {
-    if (pilots.includes(playerId) || vips.includes(playerId)) return 0
+    if (pilots.includes(playerId)) return 0
     return totalPoints
   }
 
@@ -194,11 +194,13 @@ export default function WeekValidationModal({ players, week, rows, lang, onClose
             {vips.map(id => {
               const p = players.find(pl => pl.id === id)
               const isBirthday = birthdayPlayerIds.includes(id)
+              const row = rows.find(r => r.player.id === id)
+              const nextBase = row ? getBaseScoreNextWeek(id, row.totalPoints) : 0
               return p ? (
                 <div key={id} className="text-xs text-slate-300 flex items-center gap-1 mb-0.5">
                   <span>{p.display_name}</span>
                   {isBirthday && <span className="text-pink-400">🎂</span>}
-                  <span className="text-purple-600">→ 0</span>
+                  <span className="text-amber-400">→ {nextBase}</span>
                 </div>
               ) : null
             })}
