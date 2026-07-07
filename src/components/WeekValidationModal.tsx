@@ -48,63 +48,38 @@ export default function WeekValidationModal({ players, week, rows, lang, onClose
   const assignments = useMemo(() => {
     const sorted = [...rows].sort((a, b) => b.totalPoints - a.totalPoints)
 
-    const pilots: string[] = []
-    const vips: string[] = []
-    const birthdayVips: string[] = []
+    // Birthday players get a reserved pilot spot, priority to highest points if more than 7
+    const birthdayPilots = sorted
+      .filter(r => birthdayPlayerIds.includes(r.player.id))
+      .slice(0, 7)
+      .map(r => r.player.id)
 
-    // Birthday players go to VIP (if not already pilot)
-    for (const p of sorted) {
-      if (birthdayPlayerIds.includes(p.player.id)) {
-        if (pilots.length < 7 && !vips.includes(p.player.id) && !birthdayVips.includes(p.player.id)) {
-          // Check if this person would be in top 7
-          const rank = sorted.findIndex(r => r.player.id === p.player.id)
-          if (rank < 7) {
-            // Top 7 AND birthday → pilot AND vip (-60 pts)
-            pilots.push(p.player.id)
-            birthdayVips.push(p.player.id)
-          } else {
-            birthdayVips.push(p.player.id)
-          }
-        }
-      }
-    }
-
-    // Fill remaining pilot spots (top 7 not already birthday-vip unless also pilot)
+    const pilots: string[] = [...birthdayPilots]
     for (const p of sorted) {
       if (pilots.length >= 7) break
-      if (!pilots.includes(p.player.id)) {
-        pilots.push(p.player.id)
-      }
+      if (!pilots.includes(p.player.id)) pilots.push(p.player.id)
     }
 
-    // Available VIP spots = 7 - birthday VIPs that are NOT also pilots
-    const birthdayOnlyVips = birthdayVips.filter(id => !pilots.includes(id))
-    const availableVipSpots = 7 - birthdayOnlyVips.length
-
-    // Fill remaining VIP spots
-    let vipFilled = 0
+    const vips: string[] = []
     for (const p of sorted) {
-      if (vipFilled >= availableVipSpots) break
-      if (!pilots.includes(p.player.id) && !birthdayOnlyVips.includes(p.player.id)) {
-        vips.push(p.player.id)
-        vipFilled++
-      }
+      if (vips.length >= 7) break
+      if (!pilots.includes(p.player.id)) vips.push(p.player.id)
     }
 
-    return { pilots, vips: [...vips, ...birthdayOnlyVips], birthdayBothRoles: birthdayVips.filter(id => pilots.includes(id)) }
+    return { pilots, vips, birthdayPilots }
   }, [rows, birthdayPlayerIds])
 
-  const { pilots, vips, birthdayBothRoles } = assignments
+  const { pilots, vips, birthdayPilots } = assignments
 
   function getRole(playerId: string): PlayerRole {
-    if (pilots.includes(playerId) && vips.includes(playerId)) return 'pilot' // counted as pilot primarily
     if (pilots.includes(playerId)) return 'pilot'
     if (vips.includes(playerId)) return 'vip'
     return null
   }
 
   function getBaseScoreNextWeek(playerId: string, totalPoints: number): number {
-    if (pilots.includes(playerId)) return 0
+    // Birthday pilots keep their points instead of resetting to 0
+    if (pilots.includes(playerId) && !birthdayPilots.includes(playerId)) return 0
     return totalPoints
   }
 
@@ -136,9 +111,7 @@ export default function WeekValidationModal({ players, week, rows, lang, onClose
     onSaved()
   }
 
-  const vipSpots = 7 - birthdayBothRoles.length === 7
-    ? 7 - birthdayPlayers.filter(p => !pilots.includes(p.id)).length
-    : 7
+  const pilotSpotsReserved = birthdayPilots.length
 
   return (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
@@ -164,8 +137,8 @@ export default function WeekValidationModal({ players, week, rows, lang, onClose
             </p>
             <p className="text-slate-400 text-xs mt-1">
               {lang === 'fr'
-                ? `Places VIP disponibles au classement : ${vipSpots} (sur 7)`
-                : `Available ranked VIP spots: ${vipSpots} (out of 7)`
+                ? `Places de Pilote réservées : ${pilotSpotsReserved} (sur 7) — points conservés`
+                : `Reserved Pilot spots: ${pilotSpotsReserved} (out of 7) — points kept`
               }
             </p>
           </div>
@@ -177,12 +150,14 @@ export default function WeekValidationModal({ players, week, rows, lang, onClose
             <p className="text-amber-400 font-semibold text-sm mb-2">⚙️ {t.pilot} (7)</p>
             {pilots.map(id => {
               const p = players.find(pl => pl.id === id)
-              const isBirthday = birthdayBothRoles.includes(id)
+              const isBirthday = birthdayPilots.includes(id)
+              const row = rows.find(r => r.player.id === id)
+              const nextBase = row ? getBaseScoreNextWeek(id, row.totalPoints) : 0
               return p ? (
                 <div key={id} className="text-xs text-slate-300 flex items-center gap-1 mb-0.5">
                   <span>{p.display_name}</span>
                   {isBirthday && <span className="text-pink-400">🎂</span>}
-                  <span className="text-amber-600">→ 0</span>
+                  <span className="text-amber-600">→ {nextBase}</span>
                 </div>
               ) : null
             })}
@@ -193,13 +168,11 @@ export default function WeekValidationModal({ players, week, rows, lang, onClose
             </p>
             {vips.map(id => {
               const p = players.find(pl => pl.id === id)
-              const isBirthday = birthdayPlayerIds.includes(id)
               const row = rows.find(r => r.player.id === id)
               const nextBase = row ? getBaseScoreNextWeek(id, row.totalPoints) : 0
               return p ? (
                 <div key={id} className="text-xs text-slate-300 flex items-center gap-1 mb-0.5">
                   <span>{p.display_name}</span>
-                  {isBirthday && <span className="text-pink-400">🎂</span>}
                   <span className="text-amber-400">→ {nextBase}</span>
                 </div>
               ) : null
