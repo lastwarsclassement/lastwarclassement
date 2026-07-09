@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { TRANSLATIONS, Lang, getRankColor, getRankBg, getLocale } from '@/lib/utils'
 import { getBirthdaysInRange, getWeekDates, getNextBirthdayDate, computeContributionPoints } from '@/lib/scoring'
-import type { Player, Profile, Week, DailyScore, Sanction, WeeklyRanking, PlayerRole, DayType } from '@/types'
+import type { Player, Profile, Week, DailyScore, Sanction, WeeklyRanking, PlayerRole, DayType, WeekType } from '@/types'
 import ScoreEntryModal from './ScoreEntryModal'
 import SanctionModal from './SanctionModal'
 import WeekValidationModal from './WeekValidationModal'
@@ -157,10 +157,9 @@ export default function DashboardClient({
     : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 
-  async function handleToggleWeekType() {
-    if (!activeWeek || !isAdmin) return
+  async function handleChangeWeekType(newType: WeekType) {
+    if (!activeWeek || !isAdmin || newType === activeWeek.type) return
     setWeekTypeLoading(true)
-    const newType = activeWeek.type === 'push' ? 'eco' : activeWeek.type === 'eco' ? 'push_control' : 'push'
     await fetch('/api/admin/week', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -258,24 +257,24 @@ export default function DashboardClient({
           {/* Admin action buttons */}
           {isAdmin && activeWeek && (
             <div className="flex flex-col gap-2">
-              {/* Row 1 : toggle week type */}
+              {/* Row 1 : week type selector */}
               {activeWeek.status === 'active' && (
-                <div className="flex gap-2">
-                  <button
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-slate-400">{t.weekType}</span>
+                  <select
                     data-tutorial="toggle-week-type"
-                    onClick={handleToggleWeekType}
+                    value={activeWeek.type}
+                    onChange={e => handleChangeWeekType(e.target.value as WeekType)}
                     disabled={weekTypeLoading}
-                    className="btn-secondary text-sm"
+                    className="input-field w-auto py-1.5 text-sm font-semibold"
+                    style={{
+                      color: activeWeek.type === 'push' ? '#FFB800' : activeWeek.type === 'eco' ? '#34D399' : '#A78BFA',
+                    }}
                   >
-                    {weekTypeLoading
-                      ? '...'
-                      : activeWeek.type === 'push'
-                        ? '⇄ Push → Éco'
-                        : activeWeek.type === 'eco'
-                          ? '⇄ Éco → Push Control'
-                          : '⇄ Push Control → Push'
-                    }
-                  </button>
+                    <option value="push">🟡 {t.pushWeek}</option>
+                    <option value="eco">🟢 {t.ecoWeek}</option>
+                    <option value="push_control">🟣 {t.pushControlWeek}</option>
+                  </select>
                 </div>
               )}
 

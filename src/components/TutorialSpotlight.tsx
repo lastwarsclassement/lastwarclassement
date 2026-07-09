@@ -62,10 +62,10 @@ const ADMIN_STEPS: Step[] = [
     bodyEn: 'This button starts a new week with all active players.\n\nIt is visible only **when no week is currently active**.\n\nThe week starts in **Push** mode by default.',
   },
   {
-    icon: '⇄', page: '/dashboard', target: 'toggle-week-type',
+    icon: '▼', page: '/dashboard', target: 'toggle-week-type',
     title: 'Type de semaine Push / Éco / Push Control', titleEn: 'Push / Eco / Push Control Week Type',
-    body: 'Ce bouton fait cycler le mode de la semaine : Push → Éco → Push Control → Push.\n\n**Push** — points selon paliers de score VS :\n→ ≥ 7.2M : +1 · ≥ 15M : +2 · ≥ 25M : +4 · < 7.2M : -3\n\n**Éco** — rester proche de 7.2M sans dépasser 15M :\n→ Rang 1–10 : +3 · 11–20 : +2 · 21–30 : +1 · hors zone : -3\n\n**Push Control** — paliers de score VS :\n→ < 7.2M : -3 · ≥ 7.2M : +2 · ≥ 15M : +4 · > 40M : -3',
-    bodyEn: 'This button cycles the week mode: Push → Eco → Push Control → Push.\n\n**Push** — points based on VS score thresholds:\n→ ≥ 7.2M: +1 · ≥ 15M: +2 · ≥ 25M: +4 · < 7.2M: -3\n\n**Eco** — stay close to 7.2M without exceeding 15M:\n→ Rank 1–10: +3 · 11–20: +2 · 21–30: +1 · out of zone: -3\n\n**Push Control** — VS score thresholds:\n→ < 7.2M: -3 · ≥ 7.2M: +2 · ≥ 15M: +4 · > 40M: -3',
+    body: 'Ce menu déroulant choisit le mode de la semaine.\n\n**Push** — points selon paliers de score VS :\n→ ≥ 7.2M : +1 · ≥ 15M : +2 · ≥ 25M : +4 · < 7.2M : -3\n\n**Éco** — rester proche de 7.2M sans dépasser 15M :\n→ Rang 1–10 : +3 · 11–20 : +2 · 21–30 : +1 · hors zone : -3\n\n**Push Control** — paliers de score VS :\n→ < 7.2M : -3 · ≥ 7.2M : +2 · ≥ 15M : +4 · > 40M : -3',
+    bodyEn: 'This dropdown selects the week mode.\n\n**Push** — points based on VS score thresholds:\n→ ≥ 7.2M: +1 · ≥ 15M: +2 · ≥ 25M: +4 · < 7.2M: -3\n\n**Eco** — stay close to 7.2M without exceeding 15M:\n→ Rank 1–10: +3 · 11–20: +2 · 21–30: +1 · out of zone: -3\n\n**Push Control** — VS score thresholds:\n→ < 7.2M: -3 · ≥ 7.2M: +2 · ≥ 15M: +4 · > 40M: -3',
   },
   {
     icon: '📊', page: '/dashboard', target: 'enter-scores-btn',
