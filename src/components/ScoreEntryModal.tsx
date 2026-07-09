@@ -143,7 +143,10 @@ export default function ScoreEntryModal({ players, week, existingScores, lang, o
   const filledCount = Object.values(scores).filter(v => v && parseScoreInput(v) > 0).length
 
   const dayTypeLabel = (dt: DayType, l: Lang) =>
-    dt === 'push' ? (l === 'fr' ? 'Push' : 'Push') : dt === 'eco' ? (l === 'fr' ? 'Éco' : 'Eco') : (l === 'fr' ? 'Gel' : 'Freeze')
+    dt === 'push' ? 'Push'
+      : dt === 'eco' ? (l === 'fr' ? 'Éco' : 'Eco')
+        : dt === 'push_control' ? 'Push Control'
+          : (l === 'fr' ? 'Gel' : 'Freeze')
 
   // Detect type conflict: existing scores for this date used a different mode
   const dateType = getDateType(selectedDate)
@@ -180,8 +183,8 @@ export default function ScoreEntryModal({ players, week, existingScores, lang, o
                 {hasScores && <div className="text-xs mt-0.5">✓</div>}
                 {isSun && <div className="text-xs">🤝</div>}
                 {!isSun && (
-                  <div style={{ fontSize: '0.5rem', opacity: 0.55, marginTop: '1px', color: dType === 'push' ? '#FFB800' : dType === 'eco' ? '#34D399' : '#7DD3FC' }}>
-                    {dType === 'push' ? '▲P' : dType === 'eco' ? '●É' : '🧊G'}
+                  <div style={{ fontSize: '0.5rem', opacity: 0.55, marginTop: '1px', color: dType === 'push' ? '#FFB800' : dType === 'eco' ? '#34D399' : dType === 'push_control' ? '#A78BFA' : '#7DD3FC' }}>
+                    {dType === 'push' ? '▲P' : dType === 'eco' ? '●É' : dType === 'push_control' ? '★C' : '🧊G'}
                   </div>
                 )}
               </button>

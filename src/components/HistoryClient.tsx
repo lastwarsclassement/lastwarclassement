@@ -85,7 +85,7 @@ export default function HistoryClient({ profile, weeks, players, rankings }: Pro
               >
                 {weeks.map(w => (
                   <option key={w.id} value={w.id}>
-                    S{w.week_number} · {new Date(w.start_date + 'T00:00:00Z').toLocaleDateString(getLocale(lang), { day: '2-digit', month: 'short' })} → {new Date(w.end_date + 'T00:00:00Z').toLocaleDateString(getLocale(lang), { day: '2-digit', month: 'short' })} · {w.type === 'push' ? 'Push' : 'Éco'}
+                    S{w.week_number} · {new Date(w.start_date + 'T00:00:00Z').toLocaleDateString(getLocale(lang), { day: '2-digit', month: 'short' })} → {new Date(w.end_date + 'T00:00:00Z').toLocaleDateString(getLocale(lang), { day: '2-digit', month: 'short' })} · {w.type === 'push' ? 'Push' : w.type === 'eco' ? 'Éco' : 'Push Control'}
                   </option>
                 ))}
               </select>
@@ -101,9 +101,11 @@ export default function HistoryClient({ profile, weeks, players, rankings }: Pro
                   <span className={`text-xs px-2 py-0.5 rounded-full border ${
                     selectedWeek.type === 'push'
                       ? 'bg-yellow-400/10 border-yellow-500/30 text-yellow-400'
-                      : 'bg-emerald-400/10 border-emerald-400/30 text-emerald-400'
+                      : selectedWeek.type === 'eco'
+                        ? 'bg-emerald-400/10 border-emerald-400/30 text-emerald-400'
+                        : 'bg-violet-400/10 border-violet-400/30 text-violet-400'
                   }`}>
-                    {selectedWeek.type === 'push' ? t.pushWeek : t.ecoWeek}
+                    {selectedWeek.type === 'push' ? t.pushWeek : selectedWeek.type === 'eco' ? t.ecoWeek : t.pushControlWeek}
                   </span>
                   {isAdmin && (
                     <button

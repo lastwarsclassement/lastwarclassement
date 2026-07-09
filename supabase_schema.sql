@@ -29,7 +29,7 @@ CREATE TABLE weeks (
   year INTEGER NOT NULL,
   start_date DATE NOT NULL,
   end_date DATE NOT NULL,
-  type TEXT NOT NULL CHECK (type IN ('push', 'eco')) DEFAULT 'push',
+  type TEXT NOT NULL CHECK (type IN ('push', 'eco', 'push_control')) DEFAULT 'push',
   status TEXT NOT NULL CHECK (status IN ('active', 'validated')) DEFAULT 'active',
   frozen_dates DATE[] NOT NULL DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT now(),
@@ -45,7 +45,7 @@ CREATE TABLE daily_scores (
   vs_score BIGINT,
   contribution_score BIGINT,
   points_earned INTEGER NOT NULL DEFAULT 0,
-  week_type TEXT CHECK (week_type IN ('push', 'eco', 'gel')),
+  week_type TEXT CHECK (week_type IN ('push', 'eco', 'push_control', 'gel')),
   created_at TIMESTAMPTZ DEFAULT now(),
   UNIQUE(week_id, player_id, score_date)
 );
@@ -193,3 +193,13 @@ ALTER TABLE weeks ADD COLUMN IF NOT EXISTS frozen_dates DATE[] NOT NULL DEFAULT 
 
 ALTER TABLE daily_scores DROP CONSTRAINT IF EXISTS daily_scores_week_type_check;
 ALTER TABLE daily_scores ADD CONSTRAINT daily_scores_week_type_check CHECK (week_type IN ('push', 'eco', 'gel'));
+
+-- ============================================================
+-- MIGRATION : mode "push control" (à exécuter sur une base existante)
+-- ============================================================
+
+ALTER TABLE weeks DROP CONSTRAINT IF EXISTS weeks_type_check;
+ALTER TABLE weeks ADD CONSTRAINT weeks_type_check CHECK (type IN ('push', 'eco', 'push_control'));
+
+ALTER TABLE daily_scores DROP CONSTRAINT IF EXISTS daily_scores_week_type_check;
+ALTER TABLE daily_scores ADD CONSTRAINT daily_scores_week_type_check CHECK (week_type IN ('push', 'eco', 'push_control', 'gel'));

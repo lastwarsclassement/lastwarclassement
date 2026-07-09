@@ -63,15 +63,15 @@ const ADMIN_STEPS: Step[] = [
   },
   {
     icon: '⇄', page: '/dashboard', target: 'toggle-week-type',
-    title: 'Type de semaine Push / Éco', titleEn: 'Push / Eco Week Type',
-    body: 'Ce bouton bascule le mode de la semaine.\n\n**Push** — points selon paliers de score VS :\n→ ≥ 7.2M : +1 · ≥ 15M : +2 · ≥ 25M : +4 · < 7.2M : -3\n\n**Éco** — rester proche de 7.2M sans dépasser 15M :\n→ Rang 1–10 : +3 · 11–20 : +2 · 21–30 : +1 · hors zone : -3',
-    bodyEn: 'This button toggles the week mode.\n\n**Push** — points based on VS score thresholds:\n→ ≥ 7.2M: +1 · ≥ 15M: +2 · ≥ 25M: +4 · < 7.2M: -3\n\n**Eco** — stay close to 7.2M without exceeding 15M:\n→ Rank 1–10: +3 · 11–20: +2 · 21–30: +1 · out of zone: -3',
+    title: 'Type de semaine Push / Éco / Push Control', titleEn: 'Push / Eco / Push Control Week Type',
+    body: 'Ce bouton fait cycler le mode de la semaine : Push → Éco → Push Control → Push.\n\n**Push** — points selon paliers de score VS :\n→ ≥ 7.2M : +1 · ≥ 15M : +2 · ≥ 25M : +4 · < 7.2M : -3\n\n**Éco** — rester proche de 7.2M sans dépasser 15M :\n→ Rang 1–10 : +3 · 11–20 : +2 · 21–30 : +1 · hors zone : -3\n\n**Push Control** — paliers de score VS :\n→ < 7.2M : -3 · ≥ 7.2M : +2 · ≥ 15M : +4 · > 40M : -3',
+    bodyEn: 'This button cycles the week mode: Push → Eco → Push Control → Push.\n\n**Push** — points based on VS score thresholds:\n→ ≥ 7.2M: +1 · ≥ 15M: +2 · ≥ 25M: +4 · < 7.2M: -3\n\n**Eco** — stay close to 7.2M without exceeding 15M:\n→ Rank 1–10: +3 · 11–20: +2 · 21–30: +1 · out of zone: -3\n\n**Push Control** — VS score thresholds:\n→ < 7.2M: -3 · ≥ 7.2M: +2 · ≥ 15M: +4 · > 40M: -3',
   },
   {
     icon: '📊', page: '/dashboard', target: 'enter-scores-btn',
     title: 'Saisir les scores', titleEn: 'Enter Scores',
-    body: 'Ce bouton ouvre la saisie des scores journaliers.\n\n• **Lun → Sam** : score VS (ex : 7.2M, 15000K, 25000000)\n• **Dimanche** : score de Contribution d\'Alliance\n  → Rang 1–10 : **+10 pts** · 11–20 : **+6 pts** · 21–30 : **+3 pts**\n\nLes cases ✓ indiquent les jours déjà renseignés (modifiables).\n\n🧊 À côté de la date sélectionnée, le bouton **Geler ce jour** transforme ce jour (Push ou Éco) en jour Gel : score < 7,2M → -3 pts, sinon 0 pt. Réversible, recalcule aussitôt les points déjà saisis.',
-    bodyEn: 'This button opens the daily score entry modal.\n\n• **Mon → Sat**: VS score (e.g. 7.2M, 15000K, 25000000)\n• **Sunday**: Alliance Contribution score\n  → Rank 1–10: **+10 pts** · 11–20: **+6 pts** · 21–30: **+3 pts**\n\n✓ markers show already-entered days (editable).\n\n🧊 Next to the selected date, the **Freeze this day** button turns that day (Push or Eco) into a Frozen day: score < 7.2M → -3 pts, otherwise 0 pt. Reversible, immediately recalculates points already entered.',
+    body: 'Ce bouton ouvre la saisie des scores journaliers.\n\n• **Lun → Sam** : score VS (ex : 7.2M, 15000K, 25000000)\n• **Dimanche** : score de Contribution d\'Alliance\n  → Rang 1–10 : **+10 pts** · 11–20 : **+6 pts** · 21–30 : **+3 pts**\n\nLes cases ✓ indiquent les jours déjà renseignés (modifiables).\n\n🧊 À côté de la date sélectionnée, le bouton **Geler ce jour** transforme ce jour (Push, Éco ou Push Control) en jour Gel : score < 7,2M → -3 pts, sinon 0 pt. Réversible, recalcule aussitôt les points déjà saisis.',
+    bodyEn: 'This button opens the daily score entry modal.\n\n• **Mon → Sat**: VS score (e.g. 7.2M, 15000K, 25000000)\n• **Sunday**: Alliance Contribution score\n  → Rank 1–10: **+10 pts** · 11–20: **+6 pts** · 21–30: **+3 pts**\n\n✓ markers show already-entered days (editable).\n\n🧊 Next to the selected date, the **Freeze this day** button turns that day (Push, Eco, or Push Control) into a Frozen day: score < 7.2M → -3 pts, otherwise 0 pt. Reversible, immediately recalculates points already entered.',
   },
   {
     icon: '⚠️', page: '/dashboard', target: 'sanctions-btn',

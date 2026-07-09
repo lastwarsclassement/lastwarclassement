@@ -160,7 +160,7 @@ export default function DashboardClient({
   async function handleToggleWeekType() {
     if (!activeWeek || !isAdmin) return
     setWeekTypeLoading(true)
-    const newType = activeWeek.type === 'push' ? 'eco' : 'push'
+    const newType = activeWeek.type === 'push' ? 'eco' : activeWeek.type === 'eco' ? 'push_control' : 'push'
     await fetch('/api/admin/week', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -236,8 +236,8 @@ export default function DashboardClient({
               <h1 className="lw-title text-2xl">🏆 {t.dashboard}</h1>
               {activeWeek ? (
                 <>
-                  <p className={`text-xl font-bold mt-1 ${activeWeek.type === 'push' ? 'text-amber-400' : 'text-emerald-400'}`}>
-                    {activeWeek.type === 'push' ? t.pushWeek : t.ecoWeek} S{activeWeek.week_number}
+                  <p className={`text-xl font-bold mt-1 ${activeWeek.type === 'push' ? 'text-amber-400' : activeWeek.type === 'eco' ? 'text-emerald-400' : 'text-violet-400'}`}>
+                    {activeWeek.type === 'push' ? t.pushWeek : activeWeek.type === 'eco' ? t.ecoWeek : t.pushControlWeek} S{activeWeek.week_number}
                     {activeWeek.status === 'validated' && (
                       <span className="ml-3 text-xs bg-green-500/20 border border-green-500/30 text-green-400 px-2 py-0.5 rounded-full align-middle">
                         ✓ {t.weekValidated}
@@ -271,7 +271,9 @@ export default function DashboardClient({
                       ? '...'
                       : activeWeek.type === 'push'
                         ? '⇄ Push → Éco'
-                        : '⇄ Éco → Push'
+                        : activeWeek.type === 'eco'
+                          ? '⇄ Éco → Push Control'
+                          : '⇄ Push Control → Push'
                     }
                   </button>
                 </div>
@@ -352,8 +354,8 @@ export default function DashboardClient({
                     {weekDays.map((day, i) => (
                       <th key={i} className="table-th-center w-12">
                         <div>{dayLabels[i]}</div>
-                        <div style={{ fontSize: '0.5rem', letterSpacing: '0.02em', opacity: 0.45, color: dayTypes[day] === 'push' ? '#FFB800' : dayTypes[day] === 'eco' ? '#34D399' : '#7DD3FC' }}>
-                          {dayTypes[day] === 'push' ? 'P' : dayTypes[day] === 'eco' ? 'É' : '🧊'}
+                        <div style={{ fontSize: '0.5rem', letterSpacing: '0.02em', opacity: 0.45, color: dayTypes[day] === 'push' ? '#FFB800' : dayTypes[day] === 'eco' ? '#34D399' : dayTypes[day] === 'push_control' ? '#A78BFA' : '#7DD3FC' }}>
+                          {dayTypes[day] === 'push' ? 'P' : dayTypes[day] === 'eco' ? 'É' : dayTypes[day] === 'push_control' ? 'C' : '🧊'}
                         </div>
                       </th>
                     ))}
@@ -427,7 +429,7 @@ export default function DashboardClient({
             {displayRows.length > 0 && (
               <div className="px-4 py-3 border-t border-slate-700/50 text-xs text-slate-500">
                 {players.length} {lang === 'fr' ? 'joueurs' : 'players'}
-                {activeWeek && ` · ${activeWeek.type === 'push' ? t.pushWeek : t.ecoWeek}`}
+                {activeWeek && ` · ${activeWeek.type === 'push' ? t.pushWeek : activeWeek.type === 'eco' ? t.ecoWeek : t.pushControlWeek}`}
               </div>
             )}
           </div>

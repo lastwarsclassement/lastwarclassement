@@ -1,5 +1,5 @@
 export type UserRole = 'admin' | 'reader'
-export type WeekType = 'push' | 'eco'
+export type WeekType = 'push' | 'eco' | 'push_control'
 export type DayType = WeekType | 'gel'
 export type WeekStatus = 'active' | 'validated'
 export type PlayerRole = 'pilot' | 'vip' | null

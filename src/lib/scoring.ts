@@ -42,6 +42,13 @@ export function calculatePoints(
     return 1
   }
 
+  if (weekType === 'push_control') {
+    if (vsScore < 7_200_000) return -3
+    if (vsScore > 40_000_000) return -3
+    if (vsScore >= 15_000_000) return 4
+    return 2
+  }
+
   // eco
   if (dow >= 1 && dow <= 4) {
     if (vsScore < 7_200_000) return -3
