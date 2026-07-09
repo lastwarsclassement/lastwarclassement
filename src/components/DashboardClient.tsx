@@ -266,8 +266,14 @@ export default function DashboardClient({
                     value={activeWeek.type}
                     onChange={e => handleChangeWeekType(e.target.value as WeekType)}
                     disabled={weekTypeLoading}
-                    className="input-field w-auto py-1.5 text-sm font-semibold"
+                    className="text-xs font-semibold"
                     style={{
+                      width: 'auto',
+                      padding: '4px 8px',
+                      background: '#091830',
+                      border: '1px solid #2A4F8A',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
                       color: activeWeek.type === 'push' ? '#FFB800' : activeWeek.type === 'eco' ? '#34D399' : '#A78BFA',
                     }}
                   >
