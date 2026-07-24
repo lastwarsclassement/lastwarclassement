@@ -551,6 +551,10 @@ export default function UsersClient({ players, profiles, currentProfile }: Props
         <EditAccountModal
           profile={editingProfile}
           player={players.find(p => p.id === editingProfile.player_id) ?? null}
+          players={players}
+          linkedPlayerIds={new Set(
+            profiles.filter(p => p.id !== editingProfile.id && p.player_id).map(p => p.player_id as string)
+          )}
           lang={lang}
           onClose={() => setEditingProfile(null)}
           onSaved={() => { setEditingProfile(null); router.refresh() }}

@@ -7,25 +7,30 @@ import type { Profile, Player } from '@/types'
 interface Props {
   profile: Profile
   player: Player | null
+  players: Player[]
+  linkedPlayerIds: Set<string>
   lang: Lang
   onClose: () => void
   onSaved: () => void
 }
 
-export default function EditAccountModal({ profile, player, lang, onClose, onSaved }: Props) {
+export default function EditAccountModal({ profile, player, players, linkedPlayerIds, lang, onClose, onSaved }: Props) {
   const t = TRANSLATIONS[lang]
   const [role, setRole] = useState<'reader' | 'admin'>(profile.role as 'reader' | 'admin')
+  const [playerId, setPlayerId] = useState(profile.player_id ?? '')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+
+  const availablePlayers = players.filter(p => p.id === playerId || !linkedPlayerIds.has(p.id))
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     setSaving(true)
     setError('')
 
-    const body: Record<string, string> = { profileId: profile.id, role }
+    const body: Record<string, string | null> = { profileId: profile.id, role, playerId: playerId || null }
     if (password) body.password = password
 
     const res = await fetch('/api/admin/profiles', {
@@ -92,6 +97,23 @@ export default function EditAccountModal({ profile, player, lang, onClose, onSav
                 {t.role_admin}
               </button>
             </div>
+          </div>
+
+          {/* Linked player */}
+          <div>
+            <label className="block text-xs font-medium text-slate-400 mb-2">
+              {lang === 'fr' ? 'Joueur lié' : 'Linked player'}
+            </label>
+            <select
+              className="input-field"
+              value={playerId}
+              onChange={e => setPlayerId(e.target.value)}
+            >
+              <option value="">{lang === 'fr' ? '— Aucun —' : '— None —'}</option>
+              {availablePlayers.map(p => (
+                <option key={p.id} value={p.id}>{p.display_name}</option>
+              ))}
+            </select>
           </div>
 
           {/* Password (optional) */}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { TRANSLATIONS, Lang, LANG_CYCLE, LANG_LABELS } from '@/lib/utils'
@@ -18,6 +18,14 @@ export default function Navbar({ lang, setLang, isAdmin, playerName, onProfile }
   const router = useRouter()
   const t = TRANSLATIONS[lang]
   const [langOpen, setLangOpen] = useState(false)
+  const [eventDs, setEventDs] = useState<{ visible: boolean; pending: boolean }>({ visible: false, pending: false })
+
+  useEffect(() => {
+    fetch('/api/event-ds/status')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (data) setEventDs(data) })
+      .catch(() => {})
+  }, [])
 
   async function handleLogout() {
     const supabase = createClient()
@@ -67,6 +75,17 @@ export default function Navbar({ lang, setLang, isAdmin, playerName, onProfile }
             <a href="/dashboard/history" data-tutorial="history-link" style={linkStyle} className="px-3 py-1 transition-colors hover:text-yellow-400">
               {t.history}
             </a>
+            {eventDs.visible && (
+              <a href="/dashboard/event-ds" style={linkStyle} className="relative px-3 py-1 transition-colors hover:text-yellow-400">
+                {t.eventDs}
+                {eventDs.pending && (
+                  <span
+                    className="absolute rounded-full"
+                    style={{ top: '2px', right: '-2px', width: '8px', height: '8px', background: '#FFB800' }}
+                  />
+                )}
+              </a>
+            )}
 
             {/* Lang dropdown */}
             <div style={{ position: 'relative' }}>

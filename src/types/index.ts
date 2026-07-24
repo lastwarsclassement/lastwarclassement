@@ -74,6 +74,32 @@ export interface WeeklyRanking {
   created_at: string
 }
 
+export type EventDsStatus = 'present' | 'remplacant' | 'absent'
+export type EventDsEvent = 'A' | 'B'
+
+export interface EventDsSignup {
+  id: string
+  week_id: string
+  player_id: string
+  t1_power: number | null
+  event_a_status: EventDsStatus
+  event_b_status: EventDsStatus
+  vocal: boolean
+  validated: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface EventDsAssignment {
+  id: string
+  week_id: string
+  role_key: string
+  slot_index: number
+  event: EventDsEvent
+  player_id: string | null
+  created_at: string
+}
+
 export interface PlayerWeekScore {
   player: Player
   base_score: number

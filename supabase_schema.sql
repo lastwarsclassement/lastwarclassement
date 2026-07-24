@@ -203,3 +203,39 @@ ALTER TABLE weeks ADD CONSTRAINT weeks_type_check CHECK (type IN ('push', 'eco',
 
 ALTER TABLE daily_scores DROP CONSTRAINT IF EXISTS daily_scores_week_type_check;
 ALTER TABLE daily_scores ADD CONSTRAINT daily_scores_week_type_check CHECK (week_type IN ('push', 'eco', 'push_control', 'gel'));
+
+-- ============================================================
+-- MIGRATION : onglet "Event DS Vendredi" (à exécuter sur dev et prod)
+-- ============================================================
+
+CREATE TABLE event_ds_signups (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  week_id UUID NOT NULL REFERENCES weeks(id) ON DELETE CASCADE,
+  player_id UUID NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+  t1_power BIGINT,
+  event_a_status TEXT NOT NULL DEFAULT 'absent' CHECK (event_a_status IN ('present', 'remplacant', 'absent')),
+  event_b_status TEXT NOT NULL DEFAULT 'absent' CHECK (event_b_status IN ('present', 'remplacant', 'absent')),
+  vocal BOOLEAN NOT NULL DEFAULT false,
+  validated BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(week_id, player_id),
+  CHECK (NOT (event_a_status = 'present' AND event_b_status = 'present'))
+);
+
+CREATE TABLE event_ds_assignments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  week_id UUID NOT NULL REFERENCES weeks(id) ON DELETE CASCADE,
+  role_key TEXT NOT NULL,
+  slot_index INTEGER NOT NULL DEFAULT 0,
+  event TEXT NOT NULL CHECK (event IN ('A', 'B')),
+  player_id UUID REFERENCES players(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(week_id, role_key, slot_index, event)
+);
+
+ALTER TABLE event_ds_signups ENABLE ROW LEVEL SECURITY;
+ALTER TABLE event_ds_assignments ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Authenticated can read event_ds_signups" ON event_ds_signups FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Authenticated can read event_ds_assignments" ON event_ds_assignments FOR SELECT TO authenticated USING (true);
