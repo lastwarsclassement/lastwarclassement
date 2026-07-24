@@ -22,89 +22,112 @@ export function startTutorial(role: Role) {
   window.dispatchEvent(new CustomEvent('lw:tutorial'))
 }
 
+interface Chapter {
+  id: string
+  icon: string
+  label: string
+  labelEn: string
+}
+
 interface Step {
   icon: string
+  chapter: string
   title: string; titleEn: string
   body: string; bodyEn: string
   page: string | null   // null = stay on current page
   target?: string       // data-tutorial attribute value
 }
 
+const ADMIN_CHAPTERS: Chapter[] = [
+  { id: 'intro', icon: '⚔️', label: 'Introduction', labelEn: 'Introduction' },
+  { id: 'players', icon: '👥', label: 'Joueurs & Comptes', labelEn: 'Players & Accounts' },
+  { id: 'week', icon: '📅', label: 'Gestion de semaine', labelEn: 'Week Management' },
+  { id: 'eventds', icon: '🗓️', label: 'Event DS Vendredi', labelEn: 'Friday DS Event' },
+  { id: 'history', icon: '📚', label: 'Historique & Profil', labelEn: 'History & Profile' },
+]
+
+const READER_CHAPTERS: Chapter[] = [
+  { id: 'intro', icon: '👁️', label: 'Introduction', labelEn: 'Introduction' },
+  { id: 'leaderboard', icon: '🏆', label: 'Classement', labelEn: 'Leaderboard' },
+  { id: 'eventds', icon: '🗓️', label: 'Event DS Vendredi', labelEn: 'Friday DS Event' },
+  { id: 'history', icon: '📚', label: 'Historique & Profil', labelEn: 'History & Profile' },
+]
+
 const ADMIN_STEPS: Step[] = [
   {
-    icon: '⚔️', page: '/dashboard',
+    icon: '⚔️', chapter: 'intro', page: '/dashboard',
     title: 'Bienvenue — Guide Admin', titleEn: 'Welcome — Admin Guide',
-    body: 'Ce guide interactif vous présente toutes les fonctionnalités dans l\'ordre d\'utilisation.\n\nCliquez **Suivant** pour commencer.',
-    bodyEn: 'This interactive guide walks you through all features in usage order.\n\nClick **Next** to begin.',
+    body: 'Ce guide interactif vous présente toutes les fonctionnalités dans l\'ordre d\'utilisation.\n\nCliquez **Suivant** pour commencer, ou choisissez un chapitre ci-dessus.',
+    bodyEn: 'This interactive guide walks you through all features in usage order.\n\nClick **Next** to begin, or pick a chapter above.',
   },
   {
-    icon: '➕', page: '/dashboard/users', target: 'add-player-btn',
+    icon: '➕', chapter: 'players', page: '/dashboard/users', target: 'add-player-btn',
     title: 'Créer des joueurs', titleEn: 'Create Players',
     body: 'Ce bouton ouvre le formulaire de création d\'un joueur.\n\nRemplissez :\n• **Pseudo Last War** — identifiant de connexion\n• **Date de naissance** — pour la place de Pilote réservée aux anniversaires\n• **Rôle** : Lecteur ou Admin\n• **Mot de passe** — à communiquer au joueur\n\nSi 100 joueurs actifs sont déjà présents, le joueur est créé **inactif** automatiquement.',
     bodyEn: 'This button opens the player creation form.\n\nFill in:\n• **Last War username** — login identifier\n• **Date of birth** — for the reserved Pilot spot on birthdays\n• **Role**: Reader or Admin\n• **Password** — share with the player\n\nIf 100 active players already exist, the player is created **inactive** automatically.',
   },
   {
-    icon: '🔄', page: '/dashboard/users', target: 'players-table',
+    icon: '🔄', chapter: 'players', page: '/dashboard/users', target: 'players-table',
     title: 'Gérer les joueurs actifs', titleEn: 'Manage Active Players',
     body: 'Ce tableau liste tous les joueurs (**actifs + inactifs**).\n\nMaximum **100 joueurs actifs** simultanément.\n\n• **Désactiver** : retire du classement (données conservées)\n• **Réactiver** : remet dans le classement\n• **🗑** : suppression définitive avec confirmation',
     bodyEn: 'This table lists all players (**active + inactive**).\n\nMaximum **100 active players** at once.\n\n• **Disable**: removes from leaderboard (data kept)\n• **Reactivate**: adds back to leaderboard\n• **🗑**: permanent deletion with confirmation',
   },
   {
-    icon: '🔑', page: '/dashboard/users', target: 'accounts-tab',
+    icon: '🔑', chapter: 'players', page: '/dashboard/users', target: 'accounts-tab',
     title: 'Gérer les comptes', titleEn: 'Manage Accounts',
     body: 'Cet onglet liste tous les comptes de connexion.\n\n• **✏️ Modifier** : changer le pseudo, mot de passe ou rôle\n• **🗑 Supprimer** : supprimer un compte (admins protégés)\n\nChaque joueur se connecte avec son **pseudo** (pas d\'email).',
     bodyEn: 'This tab lists all login accounts.\n\n• **✏️ Edit**: change username, password, or role\n• **🗑 Delete**: delete an account (admins protected)\n\nEach player logs in with their **username** (no email).',
   },
   {
-    icon: '▶️', page: '/dashboard', target: 'start-week-btn',
+    icon: '▶️', chapter: 'week', page: '/dashboard', target: 'start-week-btn',
     title: 'Démarrer une semaine', titleEn: 'Start a Week',
     body: 'Ce bouton lance une nouvelle semaine avec tous les joueurs actifs.\n\nIl est visible uniquement **quand aucune semaine n\'est en cours**.\n\nLa semaine démarre en mode **Push** par défaut.',
     bodyEn: 'This button starts a new week with all active players.\n\nIt is visible only **when no week is currently active**.\n\nThe week starts in **Push** mode by default.',
   },
   {
-    icon: '▼', page: '/dashboard', target: 'toggle-week-type',
+    icon: '▼', chapter: 'week', page: '/dashboard', target: 'toggle-week-type',
     title: 'Type de semaine Push / Éco / Push Control', titleEn: 'Push / Eco / Push Control Week Type',
     body: 'Ce menu déroulant choisit le mode de la semaine.\n\n**Push** — points selon paliers de score VS :\n→ ≥ 7.2M : +1 · ≥ 15M : +2 · ≥ 25M : +4 · < 7.2M : -3\n\n**Éco** — rester proche de 7.2M sans dépasser 15M :\n→ Rang 1–10 : +3 · 11–20 : +2 · 21–30 : +1 · hors zone : -3\n\n**Push Control** — paliers de score VS :\n→ < 7.2M : -3 · ≥ 7.2M : +2 · ≥ 15M : +4 · > 40M : -3',
     bodyEn: 'This dropdown selects the week mode.\n\n**Push** — points based on VS score thresholds:\n→ ≥ 7.2M: +1 · ≥ 15M: +2 · ≥ 25M: +4 · < 7.2M: -3\n\n**Eco** — stay close to 7.2M without exceeding 15M:\n→ Rank 1–10: +3 · 11–20: +2 · 21–30: +1 · out of zone: -3\n\n**Push Control** — VS score thresholds:\n→ < 7.2M: -3 · ≥ 7.2M: +2 · ≥ 15M: +4 · > 40M: -3',
   },
   {
-    icon: '📊', page: '/dashboard', target: 'enter-scores-btn',
+    icon: '📊', chapter: 'week', page: '/dashboard', target: 'enter-scores-btn',
     title: 'Saisir les scores', titleEn: 'Enter Scores',
     body: 'Ce bouton ouvre la saisie des scores journaliers.\n\n• **Lun → Sam** : score VS (ex : 7.2M, 15000K, 25000000)\n• **Dimanche** : score de Contribution d\'Alliance\n  → Rang 1–10 : **+10 pts** · 11–20 : **+6 pts** · 21–30 : **+3 pts**\n\nLes cases ✓ indiquent les jours déjà renseignés (modifiables).\n\n🧊 À côté de la date sélectionnée, le bouton **Geler ce jour** transforme ce jour (Push, Éco ou Push Control) en jour Gel : score < 7,2M → -3 pts, sinon 0 pt. Réversible, recalcule aussitôt les points déjà saisis.',
     bodyEn: 'This button opens the daily score entry modal.\n\n• **Mon → Sat**: VS score (e.g. 7.2M, 15000K, 25000000)\n• **Sunday**: Alliance Contribution score\n  → Rank 1–10: **+10 pts** · 11–20: **+6 pts** · 21–30: **+3 pts**\n\n✓ markers show already-entered days (editable).\n\n🧊 Next to the selected date, the **Freeze this day** button turns that day (Push, Eco, or Push Control) into a Frozen day: score < 7.2M → -3 pts, otherwise 0 pt. Reversible, immediately recalculates points already entered.',
   },
   {
-    icon: '⚠️', page: '/dashboard', target: 'sanctions-btn',
+    icon: '⚠️', chapter: 'week', page: '/dashboard', target: 'sanctions-btn',
     title: 'Appliquer des sanctions', titleEn: 'Apply Sanctions',
     body: 'Ce bouton ouvre le panneau de sanctions.\n\nCochez les joueurs à pénaliser : chaque sanction = **-5 pts**.\n\nPlusieurs sanctions sont cumulables sur la même semaine. Le compteur existant s\'affiche à côté de chaque joueur.',
     bodyEn: 'This button opens the sanctions panel.\n\nCheck the players to penalize: each sanction = **-5 pts**.\n\nMultiple sanctions stack in the same week. The existing count is shown next to each player.',
   },
   {
-    icon: '✅', page: '/dashboard', target: 'validate-btn',
+    icon: '✅', chapter: 'week', page: '/dashboard', target: 'validate-btn',
     title: 'Valider la semaine', titleEn: 'Validate the Week',
     body: 'Ce bouton clôture la semaine et fige le classement.\n\nL\'app attribue automatiquement :\n• **Top 7 → Pilotes** : base semaine suivante = **0**\n• **7 suivants → VIP** : base semaine suivante = **0**\n• **Anniversaires** → place de Pilote réservée (garde ses points, pas de reset)\n• **Autres joueurs** → conservent leurs points comme base\n\nVérifiez le récapitulatif puis confirmez.',
     bodyEn: 'This button closes the week and locks the ranking.\n\nThe app automatically assigns:\n• **Top 7 → Pilots**: next week base = **0**\n• **Next 7 → VIP**: next week base = **0**\n• **Birthdays** → reserved Pilot spot (keeps their points, no reset)\n• **Other players** → keep their points as base\n\nVerify the summary then confirm.',
   },
   {
-    icon: '🔓', page: '/dashboard', target: 'reopen-btn',
+    icon: '🔓', chapter: 'week', page: '/dashboard', target: 'reopen-btn',
     title: 'Rouvrir après validation', titleEn: 'Reopen After Validation',
     body: 'Ce bouton apparaît **après validation** si une correction est nécessaire.\n\nLa semaine repasse en mode actif. Corrigez scores ou sanctions, puis revalidez.\n\n⚠️ Les rôles Pilote/VIP sont effacés et recalculés à la prochaine validation.',
     bodyEn: 'This button appears **after validation** if a correction is needed.\n\nThe week goes back to active. Fix scores or sanctions, then re-validate.\n\n⚠️ Pilot/VIP roles are cleared and recalculated at next validation.',
   },
   {
-    icon: '📚', page: '/dashboard/history', target: 'history-dropdown',
+    icon: '📚', chapter: 'history', page: '/dashboard/history', target: 'history-dropdown',
     title: 'Consulter l\'historique', titleEn: 'View History',
     body: 'Ce menu déroulant liste toutes les semaines validées.\n\nSélectionnez-en une pour voir :\n• Le classement final\n• Les rôles attribués (Pilote / VIP)\n• Le score de base de la semaine suivante',
     bodyEn: 'This dropdown lists all validated weeks.\n\nSelect one to view:\n• The final ranking\n• Assigned roles (Pilot / VIP)\n• The base score for the following week',
   },
   {
-    icon: '🗓️', page: '/dashboard/event-ds', target: 'event-ds-link',
+    icon: '🗓️', chapter: 'eventds', page: '/dashboard/event-ds', target: 'event-ds-link',
     title: 'Event DS Vendredi', titleEn: 'Friday DS Event',
     body: 'Cet onglet gère l\'event du vendredi.\n\nChaque joueur actif renseigne :\n• **Puissance T1**\n• Statut **Event B (DS 13h)** et **Event A (DD 22h)** : Présent / Remplaçant / Absent — impossible d\'être **présent** aux deux à la fois\n• **Dispo vocal**\n\nEn tant qu\'admin, vous voyez en plus :\n• Le **récapitulatif** de toutes les réponses (puissance, statuts, vocal)\n• Le tableau de **répartition des 19 rôles** : un menu déroulant par poste et par event, groupé **Présent** puis **Remplaçant**. Un joueur affecté disparaît des autres menus du même event.\n\nTout se réinitialise automatiquement au **démarrage d\'une nouvelle semaine**.',
     bodyEn: 'This tab manages the Friday event.\n\nEach active player fills in:\n• **T1 Power**\n• **Event B (DS 1pm)** and **Event A (DD 10pm)** status: Present / Substitute / Absent — cannot be **present** at both at once\n• **Voice availability**\n\nAs an admin, you also see:\n• A **summary** of every response (power, statuses, voice)\n• The **19-role assignment** table: one dropdown per role and per event, grouped **Present** then **Substitute**. An assigned player disappears from the other dropdowns for that event.\n\nEverything resets automatically when a **new week starts**.',
   },
   {
-    icon: '⚙️', page: null, target: 'profile-btn',
+    icon: '⚙️', chapter: 'history', page: null, target: 'profile-btn',
     title: 'Vos paramètres personnels', titleEn: 'Your Personal Settings',
     body: 'Ce bouton ouvre votre profil personnel.\n\nVous pouvez **changer votre mot de passe** à tout moment.\n\nPour modifier le pseudo ou le mot de passe d\'un autre joueur : **Page Joueurs → Onglet Comptes**.',
     bodyEn: 'This button opens your personal profile.\n\nYou can **change your password** at any time.\n\nTo modify another player\'s username or password: **Players Page → Accounts tab**.',
@@ -113,37 +136,37 @@ const ADMIN_STEPS: Step[] = [
 
 const READER_STEPS: Step[] = [
   {
-    icon: '👁️', page: '/dashboard',
+    icon: '👁️', chapter: 'intro', page: '/dashboard',
     title: 'Bienvenue — Mode Lecteur', titleEn: 'Welcome — Reader Mode',
-    body: 'En tant que **lecteur**, vous accédez au classement en temps réel et à l\'historique des semaines passées.\n\nCliquez **Suivant** pour découvrir l\'interface.',
-    bodyEn: 'As a **reader**, you have access to the live leaderboard and history.\n\nClick **Next** to explore the interface.',
+    body: 'En tant que **lecteur**, vous accédez au classement en temps réel et à l\'historique des semaines passées.\n\nCliquez **Suivant** pour découvrir l\'interface, ou choisissez un chapitre ci-dessus.',
+    bodyEn: 'As a **reader**, you have access to the live leaderboard and history.\n\nClick **Next** to explore the interface, or pick a chapter above.',
   },
   {
-    icon: '🏆', page: '/dashboard', target: 'leaderboard-table',
+    icon: '🏆', chapter: 'leaderboard', page: '/dashboard', target: 'leaderboard-table',
     title: 'Le tableau de classement', titleEn: 'The Leaderboard',
     body: 'Ce tableau affiche le classement mis à jour après chaque saisie de scores.\n\n**Votre ligne est surlignée** en doré.\n\nBadges affichés à côté de votre pseudo :\n• **PILOTE** : top 7 de la semaine précédente\n• **VIP** : 7 suivants\n• **🎂** : anniversaire la semaine prochaine',
     bodyEn: 'This table shows the ranking updated after each score entry.\n\n**Your row is highlighted** in gold.\n\nBadges next to your name:\n• **PILOT**: top 7 from previous week\n• **VIP**: next 7\n• **🎂**: birthday next week',
   },
   {
-    icon: '📊', page: '/dashboard', target: 'leaderboard-table',
+    icon: '📊', chapter: 'leaderboard', page: '/dashboard', target: 'leaderboard-table',
     title: 'Comprendre les colonnes', titleEn: 'Understanding the Columns',
     body: 'Chaque colonne représente :\n\n• **Lun → Sam** : points gagnés ou perdus selon votre score VS du jour\n• **Dim.** : points de contribution d\'alliance du dimanche (classement automatique)\n• **Sanction** : malus appliqués par un admin (-5 pts chacun)\n• **Total** : cumul de tous vos points de la semaine en cours',
     bodyEn: 'Each column represents:\n\n• **Mon → Sat**: points won or lost based on your VS score\n• **Sun.**: Sunday alliance contribution points (auto-ranked)\n• **Sanction**: penalties applied by an admin (-5 pts each)\n• **Total**: all your points accumulated for the current week',
   },
   {
-    icon: '📚', page: '/dashboard/history', target: 'history-dropdown',
+    icon: '📚', chapter: 'history', page: '/dashboard/history', target: 'history-dropdown',
     title: 'Historique des semaines', titleEn: 'Week History',
     body: 'Ce menu déroulant liste toutes les semaines passées et validées.\n\nSélectionnez-en une pour consulter :\n• Le classement final\n• Les rôles attribués (Pilote / VIP)\n• Le score de base de la semaine suivante',
     bodyEn: 'This dropdown lists all past validated weeks.\n\nSelect one to view:\n• The final ranking\n• Assigned roles (Pilot / VIP)\n• The base score for the following week',
   },
   {
-    icon: '🗓️', page: '/dashboard/event-ds', target: 'event-ds-link',
+    icon: '🗓️', chapter: 'eventds', page: '/dashboard/event-ds', target: 'event-ds-link',
     title: 'Event DS Vendredi', titleEn: 'Friday DS Event',
     body: 'Cet onglet (visible si vous êtes un joueur actif) sert à renseigner votre disponibilité pour l\'event du vendredi :\n\n• **Puissance T1**\n• Statut **Event B (DS 13h)** et **Event A (DD 22h)** : Présent / Remplaçant / Absent — impossible d\'être **présent** aux deux à la fois\n• **Dispo vocal**\n\nCliquez **Valider** pour verrouiller votre réponse ; un bouton **Modifier** réapparaît pour la changer.\n\nUne pastille s\'affiche à côté de l\'onglet tant que vous n\'avez pas validé. Vous pouvez aussi consulter en lecture seule le récapitulatif de tous les joueurs et la répartition des rôles décidée par les admins.\n\nTout est réinitialisé automatiquement au démarrage d\'une nouvelle semaine.',
     bodyEn: 'This tab (visible if you are an active player) is where you fill in your availability for the Friday event:\n\n• **T1 Power**\n• **Event B (DS 1pm)** and **Event A (DD 10pm)** status: Present / Substitute / Absent — cannot be **present** at both at once\n• **Voice availability**\n\nClick **Validate** to lock your response; an **Edit** button reappears to change it.\n\nA dot shows next to the tab until you\'ve validated. You can also view (read-only) the summary of every player and the role assignments decided by admins.\n\nEverything resets automatically when a new week starts.',
   },
   {
-    icon: '⚙️', page: null, target: 'profile-btn',
+    icon: '⚙️', chapter: 'history', page: null, target: 'profile-btn',
     title: 'Vos paramètres', titleEn: 'Your Settings',
     body: 'Ce bouton ouvre votre profil.\n\nVous pouvez **changer votre mot de passe** de connexion.\n\nPour toute autre modification, contactez l\'administrateur de votre alliance.',
     bodyEn: 'This button opens your profile.\n\nYou can **change your login password**.\n\nFor any other changes, contact your alliance administrator.',
@@ -270,6 +293,11 @@ export default function TutorialSpotlight({ isAdmin, lang }: Props) {
   const step = steps[tut.step]
   if (!step) return null
 
+  const chapters = isAdmin ? ADMIN_CHAPTERS : READER_CHAPTERS
+  const chapterIndices = steps.map((_, i) => i).filter(i => steps[i].chapter === step.chapter)
+  const posInChapter = chapterIndices.indexOf(tut.step) + 1
+  const currentChapter = chapters.find(c => c.id === step.chapter)
+
   const isFirst = tut.step === 0
   const isLast = tut.step === steps.length - 1
   const W = typeof window !== 'undefined' ? window.innerWidth : 1440
@@ -342,9 +370,33 @@ export default function TutorialSpotlight({ isAdmin, lang }: Props) {
           <div style={{ width: '36px', height: '4px', background: '#2A4F8A', borderRadius: '2px', margin: '0 auto 14px' }} />
         )}
 
-        {/* Progress bar */}
+        {/* Chapter picker */}
+        <div className="flex gap-1 mb-2.5 flex-wrap">
+          {chapters.map(c => {
+            const firstIdx = steps.findIndex(s => s.chapter === c.id)
+            const active = c.id === step.chapter
+            return (
+              <button
+                key={c.id}
+                onClick={() => goTo(firstIdx)}
+                title={lang === 'fr' ? c.label : c.labelEn}
+                className="flex items-center justify-center rounded-full transition-all"
+                style={{
+                  width: '26px', height: '26px', fontSize: '0.8rem', flexShrink: 0,
+                  border: active ? '1px solid #FFB800' : '1px solid #2A4F8A',
+                  background: active ? 'rgba(255,184,0,0.15)' : 'rgba(74,126,196,0.12)',
+                  cursor: 'pointer',
+                }}
+              >
+                {c.icon}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Progress bar — within current chapter */}
         <div className="flex gap-0.5 mb-3">
-          {steps.map((_, i) => (
+          {chapterIndices.map(i => (
             <div key={i} onClick={() => goTo(i)}
               className="flex-1 rounded-full cursor-pointer transition-all"
               style={{ height: '3px', background: i <= tut.step ? '#FFB800' : '#1E3F6F' }} />
@@ -354,8 +406,8 @@ export default function TutorialSpotlight({ isAdmin, lang }: Props) {
         {/* Header */}
         <div className="flex items-center justify-between mb-2">
           <span style={{ fontSize: isMobile ? '1.3rem' : '1.1rem' }}>{step.icon}</span>
-          <span style={{ fontFamily: 'var(--font-heading)', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: '#5B7FA8' }}>
-            {tut.step + 1} / {steps.length}
+          <span style={{ fontFamily: 'var(--font-heading)', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: '#5B7FA8', textAlign: 'right' }}>
+            {currentChapter ? (lang === 'fr' ? currentChapter.label : currentChapter.labelEn) : ''} · {posInChapter}/{chapterIndices.length}
           </span>
         </div>
 
