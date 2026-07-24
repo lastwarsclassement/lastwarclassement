@@ -212,7 +212,7 @@ CREATE TABLE event_ds_signups (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   week_id UUID NOT NULL REFERENCES weeks(id) ON DELETE CASCADE,
   player_id UUID NOT NULL REFERENCES players(id) ON DELETE CASCADE,
-  t1_power BIGINT,
+  t1_power NUMERIC,
   event_a_status TEXT NOT NULL DEFAULT 'absent' CHECK (event_a_status IN ('present', 'remplacant', 'absent')),
   event_b_status TEXT NOT NULL DEFAULT 'absent' CHECK (event_b_status IN ('present', 'remplacant', 'absent')),
   vocal BOOLEAN NOT NULL DEFAULT false,
@@ -239,3 +239,9 @@ ALTER TABLE event_ds_assignments ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Authenticated can read event_ds_signups" ON event_ds_signups FOR SELECT TO authenticated USING (true);
 CREATE POLICY "Authenticated can read event_ds_assignments" ON event_ds_assignments FOR SELECT TO authenticated USING (true);
+
+-- ============================================================
+-- MIGRATION : puissance T1 décimale (à exécuter si event_ds_signups existe déjà)
+-- ============================================================
+
+ALTER TABLE event_ds_signups ALTER COLUMN t1_power TYPE NUMERIC USING t1_power::NUMERIC;

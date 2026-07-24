@@ -1,5 +1,26 @@
 import type { EventDsEvent } from '@/types'
 
+// Unlike parseScoreInput (used for whole-number VS/contribution scores), T1 power
+// keeps decimals exactly as typed when no K/M/B suffix is given (e.g. "36.32").
+export function parseT1Power(input: string): number | null {
+  const clean = input.trim().replace(/\s/g, '').replace(/,/g, '').toUpperCase()
+  if (!clean) return null
+  if (clean.endsWith('B')) {
+    const val = parseFloat(clean.slice(0, -1))
+    return isNaN(val) ? null : val * 1_000_000_000
+  }
+  if (clean.endsWith('M')) {
+    const val = parseFloat(clean.slice(0, -1))
+    return isNaN(val) ? null : val * 1_000_000
+  }
+  if (clean.endsWith('K')) {
+    const val = parseFloat(clean.slice(0, -1))
+    return isNaN(val) ? null : val * 1_000
+  }
+  const val = parseFloat(clean)
+  return isNaN(val) ? null : val
+}
+
 export interface EventDsRoleDef {
   key: string
   label: string

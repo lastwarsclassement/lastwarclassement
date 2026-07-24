@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { TRANSLATIONS, Lang, formatScore, parseScoreInput } from '@/lib/utils'
-import { EVENT_DS_ROLES } from '@/lib/eventDs'
+import { TRANSLATIONS, Lang, formatScore } from '@/lib/utils'
+import { EVENT_DS_ROLES, parseT1Power } from '@/lib/eventDs'
 import type { Profile, Player, Week, EventDsSignup, EventDsAssignment, EventDsStatus, EventDsEvent } from '@/types'
 import Navbar from './Navbar'
 import ProfileModal from './ProfileModal'
@@ -70,7 +70,7 @@ export default function EventDsClient({ profile, players, activeWeek, signups, a
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         weekId: activeWeek.id,
-        t1Power: t1PowerInput.trim() ? parseScoreInput(t1PowerInput) : null,
+        t1Power: parseT1Power(t1PowerInput),
         eventAStatus,
         eventBStatus,
         vocal,
