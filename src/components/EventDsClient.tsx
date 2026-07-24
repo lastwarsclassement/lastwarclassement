@@ -358,7 +358,7 @@ export default function EventDsClient({ profile, players, activeWeek, signups, a
                   <input
                     type="text"
                     className="input-field max-w-xs"
-                    placeholder="7.2M"
+                    placeholder="1.5B · 150M"
                     disabled={!editing}
                     value={t1PowerInput}
                     onChange={e => setT1PowerInput(e.target.value)}

@@ -4,8 +4,12 @@ export function formatScore(score: number): string {
 }
 
 export function parseScoreInput(input: string): number {
-  const clean = input.trim().replace(/\s/g, '').toUpperCase()
+  const clean = input.trim().replace(/\s/g, '').replace(/,/g, '').toUpperCase()
   if (!clean) return 0
+  if (clean.endsWith('B')) {
+    const val = parseFloat(clean.slice(0, -1))
+    return isNaN(val) ? 0 : Math.round(val * 1_000_000_000)
+  }
   if (clean.endsWith('M')) {
     const val = parseFloat(clean.slice(0, -1))
     return isNaN(val) ? 0 : Math.round(val * 1_000_000)
@@ -14,8 +18,8 @@ export function parseScoreInput(input: string): number {
     const val = parseFloat(clean.slice(0, -1))
     return isNaN(val) ? 0 : Math.round(val * 1_000)
   }
-  const val = parseInt(clean, 10)
-  return isNaN(val) ? 0 : val
+  const val = parseFloat(clean)
+  return isNaN(val) ? 0 : Math.round(val)
 }
 
 const LOCALES: Record<string, string> = { fr: 'fr-FR', en: 'en-US', es: 'es-ES', de: 'de-DE' }
