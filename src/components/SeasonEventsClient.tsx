@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { TRANSLATIONS, Lang, getLocale } from '@/lib/utils'
 import type { Profile, Player, Week, SeasonEvent, SeasonEventResponse, SeasonEventStatus } from '@/types'
@@ -35,6 +35,21 @@ export default function SeasonEventsClient({ profile, players, activeWeek, event
     })
     return map
   })
+
+  // router.refresh() re-renders with new props but doesn't re-run the useState
+  // initializer above — backfill any event created/loaded after first mount.
+  useEffect(() => {
+    setMyResponses(prev => {
+      const missing = events.filter(ev => !prev[ev.id])
+      if (missing.length === 0) return prev
+      const next = { ...prev }
+      missing.forEach(ev => {
+        const r = responses.find(resp => resp.event_id === ev.id && resp.player_id === currentPlayer?.id)
+        next[ev.id] = { status: r?.status ?? 'absent', editing: !r?.validated }
+      })
+      return next
+    })
+  }, [events, responses, currentPlayer?.id])
 
   const [saving, setSaving] = useState<string | null>(null)
 
