@@ -2,20 +2,36 @@
 
 import { useState } from 'react'
 import { TRANSLATIONS, Lang } from '@/lib/utils'
-import type { SeasonEvent } from '@/types'
+import type { SeasonEvent, Week } from '@/types'
 
 interface Props {
   event?: SeasonEvent | null
-  weekId: string
+  week: Week
   lang: Lang
   onClose: () => void
   onSaved: () => void
 }
 
-export default function SeasonEventModal({ event, weekId, lang, onClose, onSaved }: Props) {
+const DAY_NAMES: Record<Lang, string[]> = {
+  fr: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'],
+  en: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+  es: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
+  de: ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'],
+}
+
+function weekDates(week: Week): string[] {
+  const start = new Date(week.start_date + 'T00:00:00Z')
+  return Array.from({ length: 7 }, (_, i) =>
+    new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate() + i))
+      .toISOString().split('T')[0]
+  )
+}
+
+export default function SeasonEventModal({ event, week, lang, onClose, onSaved }: Props) {
   const t = TRANSLATIONS[lang]
+  const days = weekDates(week)
   const [name, setName] = useState(event?.name ?? '')
-  const [eventDate, setEventDate] = useState(event?.event_date ?? '')
+  const [eventDate, setEventDate] = useState(event?.event_date ?? days[0])
   const [eventTime, setEventTime] = useState(event?.event_time?.slice(0, 5) ?? '')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -31,7 +47,7 @@ export default function SeasonEventModal({ event, weekId, lang, onClose, onSaved
       body: JSON.stringify(
         event
           ? { eventId: event.id, name, eventDate, eventTime }
-          : { weekId, name, eventDate, eventTime }
+          : { weekId: week.id, name, eventDate, eventTime }
       ),
     })
 
@@ -69,14 +85,15 @@ export default function SeasonEventModal({ event, weekId, lang, onClose, onSaved
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-slate-400 mb-1">{t.seasonEventDay}</label>
-              <input
+              <select
                 className="input-field"
-                type="date"
                 value={eventDate}
                 onChange={e => setEventDate(e.target.value)}
-                required
-                style={{ colorScheme: 'dark' }}
-              />
+              >
+                {days.map((d, i) => (
+                  <option key={d} value={d}>{DAY_NAMES[lang][i]}</option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-xs font-medium text-slate-400 mb-1">{t.seasonEventTime}</label>

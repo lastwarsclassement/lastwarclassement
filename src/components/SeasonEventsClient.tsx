@@ -202,17 +202,17 @@ export default function SeasonEventsClient({ profile, players, activeWeek, event
 
       {showCreate && activeWeek && (
         <SeasonEventModal
-          weekId={activeWeek.id}
+          week={activeWeek}
           lang={lang}
           onClose={() => setShowCreate(false)}
           onSaved={() => { setShowCreate(false); router.refresh() }}
         />
       )}
 
-      {editingEvent && (
+      {editingEvent && activeWeek && (
         <SeasonEventModal
           event={editingEvent}
-          weekId={activeWeek?.id ?? ''}
+          week={activeWeek}
           lang={lang}
           onClose={() => setEditingEvent(null)}
           onSaved={() => { setEditingEvent(null); router.refresh() }}
