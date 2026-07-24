@@ -15,8 +15,11 @@ export async function POST(req: NextRequest) {
     validated: boolean
   }
 
-  if (eventAStatus === 'present' && eventBStatus === 'present') {
-    return NextResponse.json({ error: 'Présent aux deux events impossible' }, { status: 400 })
+  const invalidCombo =
+    (eventAStatus === 'present' && eventBStatus !== 'absent') ||
+    (eventBStatus === 'present' && eventAStatus !== 'absent')
+  if (invalidCombo) {
+    return NextResponse.json({ error: 'Présent à un event impose absent à l\'autre' }, { status: 400 })
   }
 
   const db = getAdmin()

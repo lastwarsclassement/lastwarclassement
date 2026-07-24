@@ -220,7 +220,7 @@ CREATE TABLE event_ds_signups (
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now(),
   UNIQUE(week_id, player_id),
-  CHECK (NOT (event_a_status = 'present' AND event_b_status = 'present'))
+  CHECK ((event_a_status != 'present' OR event_b_status = 'absent') AND (event_b_status != 'present' OR event_a_status = 'absent'))
 );
 
 CREATE TABLE event_ds_assignments (
@@ -275,3 +275,11 @@ ALTER TABLE season_event_responses ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Authenticated can read season_events" ON season_events FOR SELECT TO authenticated USING (true);
 CREATE POLICY "Authenticated can read season_event_responses" ON season_event_responses FOR SELECT TO authenticated USING (true);
+
+-- ============================================================
+-- MIGRATION : présent à un event impose absent à l'autre (à exécuter si event_ds_signups existe déjà)
+-- ============================================================
+
+ALTER TABLE event_ds_signups DROP CONSTRAINT IF EXISTS event_ds_signups_check;
+ALTER TABLE event_ds_signups ADD CONSTRAINT event_ds_signups_check
+  CHECK ((event_a_status != 'present' OR event_b_status = 'absent') AND (event_b_status != 'present' OR event_a_status = 'absent'));

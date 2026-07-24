@@ -44,6 +44,10 @@ export default function EventDsClient({ profile, players, activeWeek, signups, a
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
+  const hasInvalidCombo =
+    (eventAStatus === 'present' && eventBStatus !== 'absent') ||
+    (eventBStatus === 'present' && eventAStatus !== 'absent')
+
   const [assignmentMap, setAssignmentMap] = useState<Record<string, string | null>>(() => {
     const map: Record<string, string | null> = {}
     assignments.forEach(a => { map[assignmentKey(a.role_key, a.slot_index, a.event)] = a.player_id })
@@ -53,10 +57,10 @@ export default function EventDsClient({ profile, players, activeWeek, signups, a
   function setStatus(event: EventDsEvent, status: EventDsStatus) {
     if (event === 'A') {
       setEventAStatus(status)
-      if (status === 'present' && eventBStatus === 'present') setEventBStatus('absent')
+      if (status === 'present') setEventBStatus('absent')
     } else {
       setEventBStatus(status)
-      if (status === 'present' && eventAStatus === 'present') setEventAStatus('absent')
+      if (status === 'present') setEventAStatus('absent')
     }
   }
 
@@ -368,7 +372,7 @@ export default function EventDsClient({ profile, players, activeWeek, signups, a
                 {statusPicker('B', eventBStatus, 'Event B · DS 13h')}
                 {statusPicker('A', eventAStatus, 'Event A · DS 22h')}
 
-                {eventAStatus === 'present' && eventBStatus === 'present' && (
+                {hasInvalidCombo && (
                   <div className="mb-3 text-xs text-red-400">{t.eventDsBothPresent}</div>
                 )}
 
@@ -392,7 +396,7 @@ export default function EventDsClient({ profile, players, activeWeek, signups, a
                   {editing ? (
                     <button
                       onClick={() => handleSubmit(true)}
-                      disabled={saving || (eventAStatus === 'present' && eventBStatus === 'present')}
+                      disabled={saving || hasInvalidCombo}
                       className="btn-primary"
                     >
                       {saving ? t.loading : t.validate}
