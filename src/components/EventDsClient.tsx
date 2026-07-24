@@ -165,7 +165,8 @@ export default function EventDsClient({ profile, players, activeWeek, signups, a
 
   function renderAssignCell(role: typeof EVENT_DS_ROLES[number], event: EventDsEvent, editable: boolean) {
     const used = usedPlayerIds(event)
-    const candidates = presentPlayers(event)
+    const presentCandidates = presentPlayers(event)
+    const substituteCandidates = substitutePlayers(event)
     return (
       <div className="flex flex-col gap-1">
         {Array.from({ length: role.slots }, (_, slotIndex) => {
@@ -181,7 +182,8 @@ export default function EventDsClient({ profile, players, activeWeek, signups, a
             )
           }
 
-          const options = candidates.filter(p => p.id === assignedId || !used.has(p.id))
+          const presentOptions = presentCandidates.filter(p => p.id === assignedId || !used.has(p.id))
+          const substituteOptions = substituteCandidates.filter(p => p.id === assignedId || !used.has(p.id))
           return (
             <select
               key={key}
@@ -190,9 +192,20 @@ export default function EventDsClient({ profile, players, activeWeek, signups, a
               onChange={e => handleAssign(role.key, slotIndex, event, e.target.value || null)}
             >
               <option value="">—</option>
-              {options.map(p => (
-                <option key={p.id} value={p.id}>{p.display_name}{t1PowerLabel(p.id)}{vocalIcon(p.id)}</option>
-              ))}
+              {presentOptions.length > 0 && (
+                <optgroup label={t.statusPresent}>
+                  {presentOptions.map(p => (
+                    <option key={p.id} value={p.id}>{p.display_name}{t1PowerLabel(p.id)}{vocalIcon(p.id)}</option>
+                  ))}
+                </optgroup>
+              )}
+              {substituteOptions.length > 0 && (
+                <optgroup label={t.statusRemplacant}>
+                  {substituteOptions.map(p => (
+                    <option key={p.id} value={p.id}>{p.display_name}{t1PowerLabel(p.id)}{vocalIcon(p.id)}</option>
+                  ))}
+                </optgroup>
+              )}
             </select>
           )
         })}

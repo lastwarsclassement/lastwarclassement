@@ -76,7 +76,7 @@ export default function Navbar({ lang, setLang, isAdmin, playerName, onProfile }
               {t.history}
             </a>
             {eventDs.visible && (
-              <a href="/dashboard/event-ds" style={linkStyle} className="relative px-3 py-1 transition-colors hover:text-yellow-400">
+              <a href="/dashboard/event-ds" data-tutorial="event-ds-link" style={linkStyle} className="relative px-3 py-1 transition-colors hover:text-yellow-400">
                 {t.eventDs}
                 {eventDs.pending && (
                   <span

@@ -98,6 +98,12 @@ const ADMIN_STEPS: Step[] = [
     bodyEn: 'This dropdown lists all validated weeks.\n\nSelect one to view:\n• The final ranking\n• Assigned roles (Pilot / VIP)\n• The base score for the following week',
   },
   {
+    icon: '🗓️', page: '/dashboard/event-ds', target: 'event-ds-link',
+    title: 'Event DS Vendredi', titleEn: 'Friday DS Event',
+    body: 'Cet onglet gère l\'event du vendredi.\n\nChaque joueur actif renseigne :\n• **Puissance T1**\n• Statut **Event B (DS 13h)** et **Event A (DD 22h)** : Présent / Remplaçant / Absent — impossible d\'être **présent** aux deux à la fois\n• **Dispo vocal**\n\nEn tant qu\'admin, vous voyez en plus :\n• Le **récapitulatif** de toutes les réponses (puissance, statuts, vocal)\n• Le tableau de **répartition des 19 rôles** : un menu déroulant par poste et par event, groupé **Présent** puis **Remplaçant**. Un joueur affecté disparaît des autres menus du même event.\n\nTout se réinitialise automatiquement au **démarrage d\'une nouvelle semaine**.',
+    bodyEn: 'This tab manages the Friday event.\n\nEach active player fills in:\n• **T1 Power**\n• **Event B (DS 1pm)** and **Event A (DD 10pm)** status: Present / Substitute / Absent — cannot be **present** at both at once\n• **Voice availability**\n\nAs an admin, you also see:\n• A **summary** of every response (power, statuses, voice)\n• The **19-role assignment** table: one dropdown per role and per event, grouped **Present** then **Substitute**. An assigned player disappears from the other dropdowns for that event.\n\nEverything resets automatically when a **new week starts**.',
+  },
+  {
     icon: '⚙️', page: null, target: 'profile-btn',
     title: 'Vos paramètres personnels', titleEn: 'Your Personal Settings',
     body: 'Ce bouton ouvre votre profil personnel.\n\nVous pouvez **changer votre mot de passe** à tout moment.\n\nPour modifier le pseudo ou le mot de passe d\'un autre joueur : **Page Joueurs → Onglet Comptes**.',
@@ -129,6 +135,12 @@ const READER_STEPS: Step[] = [
     title: 'Historique des semaines', titleEn: 'Week History',
     body: 'Ce menu déroulant liste toutes les semaines passées et validées.\n\nSélectionnez-en une pour consulter :\n• Le classement final\n• Les rôles attribués (Pilote / VIP)\n• Le score de base de la semaine suivante',
     bodyEn: 'This dropdown lists all past validated weeks.\n\nSelect one to view:\n• The final ranking\n• Assigned roles (Pilot / VIP)\n• The base score for the following week',
+  },
+  {
+    icon: '🗓️', page: '/dashboard/event-ds', target: 'event-ds-link',
+    title: 'Event DS Vendredi', titleEn: 'Friday DS Event',
+    body: 'Cet onglet (visible si vous êtes un joueur actif) sert à renseigner votre disponibilité pour l\'event du vendredi :\n\n• **Puissance T1**\n• Statut **Event B (DS 13h)** et **Event A (DD 22h)** : Présent / Remplaçant / Absent — impossible d\'être **présent** aux deux à la fois\n• **Dispo vocal**\n\nCliquez **Valider** pour verrouiller votre réponse ; un bouton **Modifier** réapparaît pour la changer.\n\nUne pastille s\'affiche à côté de l\'onglet tant que vous n\'avez pas validé. Vous pouvez aussi consulter en lecture seule le récapitulatif de tous les joueurs et la répartition des rôles décidée par les admins.\n\nTout est réinitialisé automatiquement au démarrage d\'une nouvelle semaine.',
+    bodyEn: 'This tab (visible if you are an active player) is where you fill in your availability for the Friday event:\n\n• **T1 Power**\n• **Event B (DS 1pm)** and **Event A (DD 10pm)** status: Present / Substitute / Absent — cannot be **present** at both at once\n• **Voice availability**\n\nClick **Validate** to lock your response; an **Edit** button reappears to change it.\n\nA dot shows next to the tab until you\'ve validated. You can also view (read-only) the summary of every player and the role assignments decided by admins.\n\nEverything resets automatically when a new week starts.',
   },
   {
     icon: '⚙️', page: null, target: 'profile-btn',
