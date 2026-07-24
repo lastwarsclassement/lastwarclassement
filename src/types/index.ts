@@ -100,6 +100,27 @@ export interface EventDsAssignment {
   created_at: string
 }
 
+export interface SeasonEvent {
+  id: string
+  week_id: string
+  name: string
+  event_date: string
+  event_time: string
+  created_at: string
+}
+
+export type SeasonEventStatus = 'present' | 'absent'
+
+export interface SeasonEventResponse {
+  id: string
+  event_id: string
+  player_id: string
+  status: SeasonEventStatus
+  validated: boolean
+  created_at: string
+  updated_at: string
+}
+
 export interface PlayerWeekScore {
   player: Player
   base_score: number

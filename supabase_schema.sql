@@ -245,3 +245,33 @@ CREATE POLICY "Authenticated can read event_ds_assignments" ON event_ds_assignme
 -- ============================================================
 
 ALTER TABLE event_ds_signups ALTER COLUMN t1_power TYPE NUMERIC USING t1_power::NUMERIC;
+
+-- ============================================================
+-- MIGRATION : onglet "Event Saison" (à exécuter sur dev et prod)
+-- ============================================================
+
+CREATE TABLE season_events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  week_id UUID NOT NULL REFERENCES weeks(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  event_date DATE NOT NULL,
+  event_time TIME NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE season_event_responses (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_id UUID NOT NULL REFERENCES season_events(id) ON DELETE CASCADE,
+  player_id UUID NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+  status TEXT NOT NULL CHECK (status IN ('present', 'absent')),
+  validated BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(event_id, player_id)
+);
+
+ALTER TABLE season_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE season_event_responses ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Authenticated can read season_events" ON season_events FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Authenticated can read season_event_responses" ON season_event_responses FOR SELECT TO authenticated USING (true);

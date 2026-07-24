@@ -19,11 +19,16 @@ export default function Navbar({ lang, setLang, isAdmin, playerName, onProfile }
   const t = TRANSLATIONS[lang]
   const [langOpen, setLangOpen] = useState(false)
   const [eventDs, setEventDs] = useState<{ visible: boolean; pending: boolean }>({ visible: false, pending: false })
+  const [seasonEvents, setSeasonEvents] = useState<{ visible: boolean; pending: number }>({ visible: false, pending: 0 })
 
   useEffect(() => {
     fetch('/api/event-ds/status')
       .then(res => res.ok ? res.json() : null)
       .then(data => { if (data) setEventDs(data) })
+      .catch(() => {})
+    fetch('/api/season-events/status')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (data) setSeasonEvents(data) })
       .catch(() => {})
   }, [])
 
@@ -83,6 +88,22 @@ export default function Navbar({ lang, setLang, isAdmin, playerName, onProfile }
                     className="absolute rounded-full"
                     style={{ top: '2px', right: '-2px', width: '8px', height: '8px', background: '#FFB800' }}
                   />
+                )}
+              </a>
+            )}
+            {seasonEvents.visible && (
+              <a href="/dashboard/season-events" data-tutorial="season-events-link" style={linkStyle} className="relative px-3 py-1 transition-colors hover:text-yellow-400">
+                {t.seasonEvents}
+                {seasonEvents.pending > 0 && (
+                  <span
+                    className="absolute rounded-full flex items-center justify-center"
+                    style={{
+                      top: '-4px', right: '-10px', minWidth: '16px', height: '16px', padding: '0 3px',
+                      background: '#FFB800', color: '#091830', fontSize: '0.6rem', fontWeight: 800,
+                    }}
+                  >
+                    {seasonEvents.pending}
+                  </span>
                 )}
               </a>
             )}

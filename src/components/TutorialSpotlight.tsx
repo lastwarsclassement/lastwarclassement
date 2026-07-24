@@ -43,6 +43,7 @@ const ADMIN_CHAPTERS: Chapter[] = [
   { id: 'players', icon: '👥', label: 'Joueurs & Comptes', labelEn: 'Players & Accounts' },
   { id: 'week', icon: '📅', label: 'Gestion de semaine', labelEn: 'Week Management' },
   { id: 'eventds', icon: '🗓️', label: 'Event DS Vendredi', labelEn: 'Friday DS Event' },
+  { id: 'seasonevents', icon: '🎉', label: 'Event Saison', labelEn: 'Season Events' },
   { id: 'history', icon: '📚', label: 'Historique & Profil', labelEn: 'History & Profile' },
 ]
 
@@ -50,6 +51,7 @@ const READER_CHAPTERS: Chapter[] = [
   { id: 'intro', icon: '👁️', label: 'Introduction', labelEn: 'Introduction' },
   { id: 'leaderboard', icon: '🏆', label: 'Classement', labelEn: 'Leaderboard' },
   { id: 'eventds', icon: '🗓️', label: 'Event DS Vendredi', labelEn: 'Friday DS Event' },
+  { id: 'seasonevents', icon: '🎉', label: 'Event Saison', labelEn: 'Season Events' },
   { id: 'history', icon: '📚', label: 'Historique & Profil', labelEn: 'History & Profile' },
 ]
 
@@ -127,6 +129,12 @@ const ADMIN_STEPS: Step[] = [
     bodyEn: 'This tab manages the Friday event.\n\nEach active player fills in:\n• **T1 Power**\n• **Event B (DS 1pm)** and **Event A (DD 10pm)** status: Present / Substitute / Absent — cannot be **present** at both at once\n• **Voice availability**\n\nAs an admin, you also see:\n• A **summary** of every response (power, statuses, voice)\n• The **19-role assignment** table: one dropdown per role and per event, grouped **Present** then **Substitute**. An assigned player disappears from the other dropdowns for that event.\n\nEverything resets automatically when a **new week starts**.',
   },
   {
+    icon: '🎉', chapter: 'seasonevents', page: '/dashboard/season-events', target: 'season-events-link',
+    title: 'Event Saison', titleEn: 'Season Events',
+    body: 'Cet onglet permet de créer des events ponctuels (autres que l\'event du vendredi) : cliquez **+ Créer un event** et renseignez son **nom**, son **jour** et son **heure**.\n\nUn nombre illimité d\'events peut coexister. Chaque joueur actif marque **Présent** ou **Absent**, puis **Valide** sa réponse (un bouton **Modifier** réapparaît pour la changer). Un récapitulatif des présents s\'affiche sous chaque event.\n\nUne pastille avec le nombre d\'events sans réponse s\'affiche à côté de l\'onglet pour prévenir tous les joueurs dès qu\'un event est créé.\n\nVous pouvez **✏️ modifier** ou **🗑 supprimer** un event à tout moment. Tout est effacé au **démarrage d\'une nouvelle semaine**.',
+    bodyEn: 'This tab lets you create one-off events (other than the Friday event): click **+ Create event** and fill in its **name**, **day**, and **time**.\n\nAn unlimited number of events can coexist. Each active player marks **Present** or **Absent**, then **Validates** their response (an **Edit** button reappears to change it). A summary of present players shows under each event.\n\nA badge with the number of unanswered events shows next to the tab to notify every player as soon as an event is created.\n\nYou can **✏️ edit** or **🗑 delete** an event at any time. Everything is cleared when a **new week starts**.',
+  },
+  {
     icon: '⚙️', chapter: 'history', page: null, target: 'profile-btn',
     title: 'Vos paramètres personnels', titleEn: 'Your Personal Settings',
     body: 'Ce bouton ouvre votre profil personnel.\n\nVous pouvez **changer votre mot de passe** à tout moment.\n\nPour modifier le pseudo ou le mot de passe d\'un autre joueur : **Page Joueurs → Onglet Comptes**.',
@@ -164,6 +172,12 @@ const READER_STEPS: Step[] = [
     title: 'Event DS Vendredi', titleEn: 'Friday DS Event',
     body: 'Cet onglet (visible si vous êtes un joueur actif) sert à renseigner votre disponibilité pour l\'event du vendredi :\n\n• **Puissance T1**\n• Statut **Event B (DS 13h)** et **Event A (DD 22h)** : Présent / Remplaçant / Absent — impossible d\'être **présent** aux deux à la fois\n• **Dispo vocal**\n\nCliquez **Valider** pour verrouiller votre réponse ; un bouton **Modifier** réapparaît pour la changer.\n\nUne pastille s\'affiche à côté de l\'onglet tant que vous n\'avez pas validé. Vous pouvez aussi consulter en lecture seule le récapitulatif de tous les joueurs et la répartition des rôles décidée par les admins.\n\nTout est réinitialisé automatiquement au démarrage d\'une nouvelle semaine.',
     bodyEn: 'This tab (visible if you are an active player) is where you fill in your availability for the Friday event:\n\n• **T1 Power**\n• **Event B (DS 1pm)** and **Event A (DD 10pm)** status: Present / Substitute / Absent — cannot be **present** at both at once\n• **Voice availability**\n\nClick **Validate** to lock your response; an **Edit** button reappears to change it.\n\nA dot shows next to the tab until you\'ve validated. You can also view (read-only) the summary of every player and the role assignments decided by admins.\n\nEverything resets automatically when a new week starts.',
+  },
+  {
+    icon: '🎉', chapter: 'seasonevents', page: '/dashboard/season-events', target: 'season-events-link',
+    title: 'Event Saison', titleEn: 'Season Events',
+    body: 'Cet onglet (visible si vous êtes un joueur actif) liste les events ponctuels créés par les admins (nom, jour, heure).\n\nPour chacun, marquez **Présent** ou **Absent** puis cliquez **Valider** (un bouton **Modifier** réapparaît pour changer votre réponse). Un récapitulatif des présents s\'affiche sous chaque event.\n\nUne pastille avec le nombre d\'events sans réponse s\'affiche à côté de l\'onglet dès qu\'un nouvel event est créé.\n\nTout est effacé au démarrage d\'une nouvelle semaine.',
+    bodyEn: 'This tab (visible if you are an active player) lists one-off events created by admins (name, day, time).\n\nFor each one, mark **Present** or **Absent** then click **Validate** (an **Edit** button reappears to change your response). A summary of present players shows under each event.\n\nA badge with the number of unanswered events shows next to the tab as soon as a new event is created.\n\nEverything is cleared when a new week starts.',
   },
   {
     icon: '⚙️', chapter: 'history', page: null, target: 'profile-btn',
