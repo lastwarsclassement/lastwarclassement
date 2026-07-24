@@ -148,6 +148,11 @@ export default function EventDsClient({ profile, players, activeWeek, signups, a
     return signups.find(s => s.player_id === playerId)?.vocal ? ' 🎤' : ''
   }
 
+  function t1PowerLabel(playerId: string) {
+    const power = signups.find(s => s.player_id === playerId)?.t1_power
+    return power ? ` (${formatScore(power)})` : ''
+  }
+
   async function handleAssign(roleKey: string, slotIndex: number, event: EventDsEvent, playerId: string | null) {
     const key = assignmentKey(roleKey, slotIndex, event)
     setAssignmentMap(prev => ({ ...prev, [key]: playerId }))
@@ -171,7 +176,7 @@ export default function EventDsClient({ profile, players, activeWeek, signups, a
             const assignedPlayer = assignedId ? players.find(p => p.id === assignedId) : null
             return (
               <div key={key} className="text-xs text-slate-200 px-1 py-1">
-                {assignedPlayer ? `${assignedPlayer.display_name}${vocalIcon(assignedPlayer.id)}` : '—'}
+                {assignedPlayer ? `${assignedPlayer.display_name}${t1PowerLabel(assignedPlayer.id)}${vocalIcon(assignedPlayer.id)}` : '—'}
               </div>
             )
           }
@@ -186,7 +191,7 @@ export default function EventDsClient({ profile, players, activeWeek, signups, a
             >
               <option value="">—</option>
               {options.map(p => (
-                <option key={p.id} value={p.id}>{p.display_name}{vocalIcon(p.id)}</option>
+                <option key={p.id} value={p.id}>{p.display_name}{t1PowerLabel(p.id)}{vocalIcon(p.id)}</option>
               ))}
             </select>
           )
@@ -275,7 +280,7 @@ export default function EventDsClient({ profile, players, activeWeek, signups, a
                   <div className="flex flex-col gap-1">
                     {substitutePlayers('A').map(p => (
                       <div key={p.id} className="input-field text-xs py-1 bg-slate-800/50">
-                        {p.display_name}{vocalIcon(p.id)}
+                        {p.display_name}{t1PowerLabel(p.id)}{vocalIcon(p.id)}
                       </div>
                     ))}
                   </div>
@@ -284,7 +289,7 @@ export default function EventDsClient({ profile, players, activeWeek, signups, a
                   <div className="flex flex-col gap-1">
                     {substitutePlayers('B').map(p => (
                       <div key={p.id} className="input-field text-xs py-1 bg-slate-800/50">
-                        {p.display_name}{vocalIcon(p.id)}
+                        {p.display_name}{t1PowerLabel(p.id)}{vocalIcon(p.id)}
                       </div>
                     ))}
                   </div>
