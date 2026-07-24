@@ -408,12 +408,12 @@ export default function EventDsClient({ profile, players, activeWeek, signups, a
               <div className="card p-6 text-center text-slate-400">{t.eventDsNoPlayer}</div>
             )}
 
-            {/* Recap table: T1 power, statuses, vocal for every player — always read-only */}
-            {(isAdmin || currentPlayer) && renderRecapTable()}
-
             {/* Role assignment table: editable for admins, read-only for players */}
             {isAdmin && renderRoleTable(true)}
             {!isAdmin && currentPlayer && renderRoleTable(false)}
+
+            {/* Recap table: T1 power, statuses, vocal for every player — always read-only */}
+            {(isAdmin || currentPlayer) && renderRecapTable()}
           </div>
         )}
       </div>
