@@ -49,6 +49,7 @@ export default function DashboardClient({
   const [showValidation, setShowValidation] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
   const [weekTypeLoading, setWeekTypeLoading] = useState(false)
+  const [weekTypeError, setWeekTypeError] = useState('')
   const [startingWeek, setStartingWeek] = useState(false)
 
   const currentPlayer = players.find(p => p.id === profile?.player_id) ?? null
@@ -160,11 +161,16 @@ export default function DashboardClient({
   async function handleChangeWeekType(newType: WeekType) {
     if (!activeWeek || !isAdmin || newType === activeWeek.type) return
     setWeekTypeLoading(true)
-    await fetch('/api/admin/week', {
+    setWeekTypeError('')
+    const res = await fetch('/api/admin/week', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ weekId: activeWeek.id, type: newType }),
     })
+    if (!res.ok) {
+      const data = await res.json().catch(() => null)
+      setWeekTypeError(data?.error || t.error)
+    }
     setWeekTypeLoading(false)
     router.refresh()
   }
@@ -281,6 +287,9 @@ export default function DashboardClient({
                     <option value="eco">🟢 {t.ecoWeek}</option>
                     <option value="push_control">🟣 {t.pushControlWeek}</option>
                   </select>
+                  {weekTypeError && (
+                    <span className="text-xs text-red-400">{weekTypeError}</span>
+                  )}
                 </div>
               )}
 
