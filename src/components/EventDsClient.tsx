@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { TRANSLATIONS, Lang, formatScore } from '@/lib/utils'
-import { EVENT_DS_ROLES, parseT1Power } from '@/lib/eventDs'
+import { EVENT_DS_ROLES, parseT1Power, isEventDsSignupOpen } from '@/lib/eventDs'
 import type { Profile, Player, Week, EventDsSignup, EventDsAssignment, EventDsStatus, EventDsEvent } from '@/types'
 import Navbar from './Navbar'
 import ProfileModal from './ProfileModal'
@@ -35,12 +35,13 @@ export default function EventDsClient({ profile, players, activeWeek, signups, a
   const isAdmin = profile?.role === 'admin'
   const currentPlayer = players.find(p => p.id === profile?.player_id) ?? null
   const mySignup = signups.find(s => s.player_id === currentPlayer?.id) ?? null
+  const signupOpen = activeWeek ? isEventDsSignupOpen(activeWeek) : false
 
   const [t1PowerInput, setT1PowerInput] = useState(mySignup?.t1_power ? formatScore(mySignup.t1_power) : '')
   const [eventAStatus, setEventAStatus] = useState<EventDsStatus>(mySignup?.event_a_status ?? 'absent')
   const [eventBStatus, setEventBStatus] = useState<EventDsStatus>(mySignup?.event_b_status ?? 'absent')
   const [vocal, setVocal] = useState(mySignup?.vocal ?? false)
-  const [editing, setEditing] = useState(!mySignup?.validated)
+  const [editing, setEditing] = useState(signupOpen && !mySignup?.validated)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -345,6 +346,12 @@ export default function EventDsClient({ profile, players, activeWeek, signups, a
               {lang === 'fr' ? 'Vendredi' : 'Friday'} {fridayDate(activeWeek)}
             </p>
 
+            {!signupOpen && (
+              <div className="bg-amber-400/10 border border-amber-400/30 rounded-lg p-3 text-amber-400 text-sm">
+                {t.eventDsSignupClosed}
+              </div>
+            )}
+
             {/* Personal form */}
             {currentPlayer ? (
               <div className="card p-5">
@@ -401,11 +408,11 @@ export default function EventDsClient({ profile, players, activeWeek, signups, a
                     >
                       {saving ? t.loading : t.validate}
                     </button>
-                  ) : (
+                  ) : signupOpen ? (
                     <button onClick={() => handleSubmit(false)} disabled={saving} className="btn-secondary">
                       {saving ? t.loading : t.edit}
                     </button>
-                  )}
+                  ) : null}
                 </div>
               </div>
             ) : !isAdmin && (

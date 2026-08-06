@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdmin, getSessionUser } from '@/lib/admin'
+import { isEventDsSignupOpen } from '@/lib/eventDs'
 import type { EventDsStatus } from '@/types'
 
 export async function POST(req: NextRequest) {
@@ -23,6 +24,12 @@ export async function POST(req: NextRequest) {
   }
 
   const db = getAdmin()
+
+  const { data: week } = await db.from('weeks').select('start_date').eq('id', weekId).single()
+  if (!week) return NextResponse.json({ error: 'Semaine introuvable' }, { status: 404 })
+  if (!isEventDsSignupOpen(week)) {
+    return NextResponse.json({ error: 'Les inscriptions sont fermées (ouvertes du lundi 8h au mercredi 22h).' }, { status: 403 })
+  }
 
   const { data: profile } = await db.from('profiles').select('player_id').eq('id', user.id).single()
   if (!profile?.player_id) return NextResponse.json({ error: 'Aucun joueur lié à ce compte' }, { status: 403 })

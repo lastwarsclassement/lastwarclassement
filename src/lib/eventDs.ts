@@ -1,4 +1,4 @@
-import type { EventDsEvent } from '@/types'
+import type { EventDsEvent, Week } from '@/types'
 
 // Unlike parseScoreInput (used for whole-number VS/contribution scores), T1 power
 // keeps decimals exactly as typed when no K/M/B suffix is given (e.g. "36.32").
@@ -54,3 +54,37 @@ export const EVENT_DS_EVENTS: { key: EventDsEvent; label: string }[] = [
   { key: 'B', label: 'Event B · DS 13h' },
   { key: 'A', label: 'Event A · DS 22h' },
 ]
+
+// Offset (in minutes) of Europe/Paris vs UTC at the given instant, accounting for DST.
+function parisOffsetMinutes(utcMs: number): number {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Europe/Paris', hour12: false,
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+  }).formatToParts(new Date(utcMs))
+  const get = (type: string) => Number(parts.find(p => p.type === type)?.value)
+  const asUtc = Date.UTC(get('year'), get('month') - 1, get('day'), get('hour') % 24, get('minute'), get('second'))
+  return Math.round((asUtc - utcMs) / 60_000)
+}
+
+// Converts a Europe/Paris wall-clock date/time into the corresponding UTC instant.
+function parisWallTimeToUtc(year: number, month: number, day: number, hour: number, minute: number): Date {
+  const naiveUtcMs = Date.UTC(year, month - 1, day, hour, minute, 0)
+  const offset = parisOffsetMinutes(naiveUtcMs)
+  return new Date(naiveUtcMs - offset * 60_000)
+}
+
+// Event DS signups open Monday 8h and close Wednesday 22h, Europe/Paris time,
+// of the week leading up to Friday's event (week.start_date is that Monday).
+export function getEventDsSignupWindow(week: Pick<Week, 'start_date'>): { opensAt: Date; closesAt: Date } {
+  const [year, month, day] = week.start_date.split('-').map(Number)
+  return {
+    opensAt: parisWallTimeToUtc(year, month, day, 8, 0),
+    closesAt: parisWallTimeToUtc(year, month, day + 2, 22, 0),
+  }
+}
+
+export function isEventDsSignupOpen(week: Pick<Week, 'start_date'>, now: Date = new Date()): boolean {
+  const { opensAt, closesAt } = getEventDsSignupWindow(week)
+  return now >= opensAt && now <= closesAt
+}
