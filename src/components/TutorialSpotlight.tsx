@@ -101,8 +101,8 @@ const ADMIN_STEPS: Step[] = [
   {
     icon: '⚠️', chapter: 'week', page: '/dashboard', target: 'sanctions-btn',
     title: 'Appliquer des sanctions', titleEn: 'Apply Sanctions',
-    body: 'Ce bouton ouvre le panneau de sanctions.\n\nCochez les joueurs à pénaliser : chaque sanction = **-5 pts**.\n\nPlusieurs sanctions sont cumulables sur la même semaine. Le compteur existant s\'affiche à côté de chaque joueur.',
-    bodyEn: 'This button opens the sanctions panel.\n\nCheck the players to penalize: each sanction = **-5 pts**.\n\nMultiple sanctions stack in the same week. The existing count is shown next to each player.',
+    body: 'Ce bouton ouvre le panneau de sanctions.\n\nChoisissez le nombre de points à retirer, puis cochez les joueurs à pénaliser.\n\nPlusieurs sanctions sont cumulables sur la même semaine. Le compteur existant s\'affiche à côté de chaque joueur, et chaque sanction peut être annulée depuis ce panneau.',
+    bodyEn: 'This button opens the sanctions panel.\n\nChoose how many points to deduct, then check the players to penalize.\n\nMultiple sanctions stack in the same week. The existing count is shown next to each player, and each sanction can be canceled from this panel.',
   },
   {
     icon: '✅', chapter: 'week', page: '/dashboard', target: 'validate-btn',
@@ -158,8 +158,8 @@ const READER_STEPS: Step[] = [
   {
     icon: '📊', chapter: 'leaderboard', page: '/dashboard', target: 'leaderboard-table',
     title: 'Comprendre les colonnes', titleEn: 'Understanding the Columns',
-    body: 'Chaque colonne représente :\n\n• **Lun → Sam** : points gagnés ou perdus selon votre score VS du jour\n• **Dim.** : points de contribution d\'alliance du dimanche (classement automatique)\n• **Sanction** : malus appliqués par un admin (-5 pts chacun)\n• **Total** : cumul de tous vos points de la semaine en cours',
-    bodyEn: 'Each column represents:\n\n• **Mon → Sat**: points won or lost based on your VS score\n• **Sun.**: Sunday alliance contribution points (auto-ranked)\n• **Sanction**: penalties applied by an admin (-5 pts each)\n• **Total**: all your points accumulated for the current week',
+    body: 'Chaque colonne représente :\n\n• **Lun → Sam** : points gagnés ou perdus selon votre score VS du jour\n• **Dim.** : points de contribution d\'alliance du dimanche (classement automatique)\n• **Sanction** : malus appliqués par un admin (valeur libre, définie au cas par cas)\n• **Total** : cumul de tous vos points de la semaine en cours',
+    bodyEn: 'Each column represents:\n\n• **Mon → Sat**: points won or lost based on your VS score\n• **Sun.**: Sunday alliance contribution points (auto-ranked)\n• **Sanction**: penalties applied by an admin (custom value, set case by case)\n• **Total**: all your points accumulated for the current week',
   },
   {
     icon: '📚', chapter: 'history', page: '/dashboard/history', target: 'history-dropdown',
