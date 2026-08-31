@@ -65,8 +65,8 @@ const ADMIN_STEPS: Step[] = [
   {
     icon: '➕', chapter: 'players', page: '/dashboard/users', target: 'add-player-btn',
     title: 'Créer des joueurs', titleEn: 'Create Players',
-    body: 'Ce bouton ouvre le formulaire de création d\'un joueur.\n\nRemplissez :\n• **Pseudo Last War** — identifiant de connexion\n• **Date de naissance** — pour la place de Pilote réservée aux anniversaires\n• **Rôle** : Lecteur ou Admin\n• **Mot de passe** — à communiquer au joueur\n\nSi 100 joueurs actifs sont déjà présents, le joueur est créé **inactif** automatiquement.',
-    bodyEn: 'This button opens the player creation form.\n\nFill in:\n• **Last War username** — login identifier\n• **Date of birth** — for the reserved Pilot spot on birthdays\n• **Role**: Reader or Admin\n• **Password** — share with the player\n\nIf 100 active players already exist, the player is created **inactive** automatically.',
+    body: 'Ce bouton ouvre le formulaire de création d\'un joueur.\n\nRemplissez :\n• **Pseudo Last War** — identifiant de connexion\n• **Date de naissance** — affiche un badge 🎂 la semaine de son anniversaire\n• **Rôle** : Lecteur ou Admin\n• **Mot de passe** — à communiquer au joueur\n\nSi 100 joueurs actifs sont déjà présents, le joueur est créé **inactif** automatiquement.',
+    bodyEn: 'This button opens the player creation form.\n\nFill in:\n• **Last War username** — login identifier\n• **Date of birth** — shows a 🎂 badge during their birthday week\n• **Role**: Reader or Admin\n• **Password** — share with the player\n\nIf 100 active players already exist, the player is created **inactive** automatically.',
   },
   {
     icon: '🔄', chapter: 'players', page: '/dashboard/users', target: 'players-table',
@@ -107,8 +107,8 @@ const ADMIN_STEPS: Step[] = [
   {
     icon: '✅', chapter: 'week', page: '/dashboard', target: 'validate-btn',
     title: 'Valider la semaine', titleEn: 'Validate the Week',
-    body: 'Ce bouton clôture la semaine et fige le classement.\n\nL\'app attribue automatiquement :\n• **Top 7 → Pilotes** : base semaine suivante = **0**\n• **7 suivants → VIP** : base semaine suivante = **0**\n• **Anniversaires** → place de Pilote réservée (garde ses points, pas de reset)\n• **Autres joueurs** → conservent leurs points comme base\n\nVérifiez le récapitulatif puis confirmez.',
-    bodyEn: 'This button closes the week and locks the ranking.\n\nThe app automatically assigns:\n• **Top 7 → Pilots**: next week base = **0**\n• **Next 7 → VIP**: next week base = **0**\n• **Birthdays** → reserved Pilot spot (keeps their points, no reset)\n• **Other players** → keep their points as base\n\nVerify the summary then confirm.',
+    body: 'Ce bouton clôture la semaine et fige le classement.\n\nL\'app attribue automatiquement, uniquement selon le classement :\n• **Top 7 → Pilotes** : base semaine suivante = **0**\n• **7 suivants → VIP** : conservent leurs points comme base\n• **Autres joueurs** → conservent leurs points comme base\n\nLes anniversaires n\'ont plus d\'effet sur les rôles (badge 🎂 informatif uniquement).\n\nVérifiez le récapitulatif puis confirmez.',
+    bodyEn: 'This button closes the week and locks the ranking.\n\nThe app automatically assigns roles based on ranking only:\n• **Top 7 → Pilots**: next week base = **0**\n• **Next 7 → VIP**: keep their points as base\n• **Other players** → keep their points as base\n\nBirthdays no longer affect roles (🎂 badge is informational only).\n\nVerify the summary then confirm.',
   },
   {
     icon: '🔓', chapter: 'week', page: '/dashboard', target: 'reopen-btn',

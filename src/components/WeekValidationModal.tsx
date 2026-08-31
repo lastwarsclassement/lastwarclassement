@@ -44,32 +44,15 @@ export default function WeekValidationModal({ players, week, rows, lang, onClose
 
   const birthdayPlayers = players.filter(p => birthdayPlayerIds.includes(p.id))
 
-  // Determine roles
+  // Determine roles — purely by rank, no birthday reservation
   const assignments = useMemo(() => {
     const sorted = [...rows].sort((a, b) => b.totalPoints - a.totalPoints)
+    const pilots = sorted.slice(0, 7).map(r => r.player.id)
+    const vips = sorted.slice(7, 14).map(r => r.player.id)
+    return { pilots, vips }
+  }, [rows])
 
-    // Birthday players get a reserved pilot spot, priority to highest points if more than 7
-    const birthdayPilots = sorted
-      .filter(r => birthdayPlayerIds.includes(r.player.id))
-      .slice(0, 7)
-      .map(r => r.player.id)
-
-    const pilots: string[] = [...birthdayPilots]
-    for (const p of sorted) {
-      if (pilots.length >= 7) break
-      if (!pilots.includes(p.player.id)) pilots.push(p.player.id)
-    }
-
-    const vips: string[] = []
-    for (const p of sorted) {
-      if (vips.length >= 7) break
-      if (!pilots.includes(p.player.id)) vips.push(p.player.id)
-    }
-
-    return { pilots, vips, birthdayPilots }
-  }, [rows, birthdayPlayerIds])
-
-  const { pilots, vips, birthdayPilots } = assignments
+  const { pilots, vips } = assignments
 
   function getRole(playerId: string): PlayerRole {
     if (pilots.includes(playerId)) return 'pilot'
@@ -78,8 +61,7 @@ export default function WeekValidationModal({ players, week, rows, lang, onClose
   }
 
   function getBaseScoreNextWeek(playerId: string, totalPoints: number): number {
-    // Birthday pilots keep their points instead of resetting to 0
-    if (pilots.includes(playerId) && !birthdayPilots.includes(playerId)) return 0
+    if (pilots.includes(playerId)) return 0
     return totalPoints
   }
 
@@ -111,8 +93,6 @@ export default function WeekValidationModal({ players, week, rows, lang, onClose
     onSaved()
   }
 
-  const pilotSpotsReserved = birthdayPilots.length
-
   return (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal-box max-w-2xl fade-in">
@@ -135,12 +115,6 @@ export default function WeekValidationModal({ players, week, rows, lang, onClose
                 return `${p.display_name} (${day}/${month})`
               }).join(', ')}
             </p>
-            <p className="text-slate-400 text-xs mt-1">
-              {lang === 'fr'
-                ? `Places de Pilote réservées : ${pilotSpotsReserved} (sur 7) — points conservés`
-                : `Reserved Pilot spots: ${pilotSpotsReserved} (out of 7) — points kept`
-              }
-            </p>
           </div>
         )}
 
@@ -150,7 +124,7 @@ export default function WeekValidationModal({ players, week, rows, lang, onClose
             <p className="text-amber-400 font-semibold text-sm mb-2">⚙️ {t.pilot} (7)</p>
             {pilots.map(id => {
               const p = players.find(pl => pl.id === id)
-              const isBirthday = birthdayPilots.includes(id)
+              const isBirthday = birthdayPlayerIds.includes(id)
               const row = rows.find(r => r.player.id === id)
               const nextBase = row ? getBaseScoreNextWeek(id, row.totalPoints) : 0
               return p ? (
@@ -168,11 +142,13 @@ export default function WeekValidationModal({ players, week, rows, lang, onClose
             </p>
             {vips.map(id => {
               const p = players.find(pl => pl.id === id)
+              const isBirthday = birthdayPlayerIds.includes(id)
               const row = rows.find(r => r.player.id === id)
               const nextBase = row ? getBaseScoreNextWeek(id, row.totalPoints) : 0
               return p ? (
                 <div key={id} className="text-xs text-slate-300 flex items-center gap-1 mb-0.5">
                   <span>{p.display_name}</span>
+                  {isBirthday && <span className="text-pink-400">🎂</span>}
                   <span className="text-amber-400">→ {nextBase}</span>
                 </div>
               ) : null
