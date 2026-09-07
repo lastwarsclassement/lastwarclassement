@@ -4,9 +4,10 @@ import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { TRANSLATIONS, Lang, getRankColor, getRankBg, getLocale } from '@/lib/utils'
 import { getBirthdaysInRange, getWeekDates, getNextBirthdayDate, computeContributionPoints } from '@/lib/scoring'
-import type { Player, Profile, Week, DailyScore, Sanction, WeeklyRanking, PlayerRole, DayType, WeekType } from '@/types'
+import type { Player, Profile, Week, DailyScore, Sanction, Reward, WeeklyRanking, PlayerRole, DayType, WeekType } from '@/types'
 import ScoreEntryModal from './ScoreEntryModal'
 import SanctionModal from './SanctionModal'
+import RewardModal from './RewardModal'
 import WeekValidationModal from './WeekValidationModal'
 import ProfileModal from './ProfileModal'
 import Navbar from './Navbar'
@@ -18,6 +19,7 @@ interface Props {
   activeWeek: Week | null
   dailyScores: DailyScore[]
   sanctions: Sanction[]
+  rewards: Reward[]
   baseScores: { player_id: string; base_score: number; week_id: string }[]
   weekRankings: WeeklyRanking[]
 }
@@ -29,6 +31,7 @@ interface PlayerRow {
   dailyPoints: number
   contributionPoints: number
   sanctionPoints: number
+  rewardPoints: number
   totalPoints: number
   rank: number
   role: PlayerRole
@@ -37,7 +40,7 @@ interface PlayerRow {
 
 export default function DashboardClient({
   currentUser, profile, players, activeWeek,
-  dailyScores, sanctions, baseScores, weekRankings,
+  dailyScores, sanctions, rewards, baseScores, weekRankings,
 }: Props) {
   const router = useRouter()
   const [lang, setLang] = useState<Lang>('fr')
@@ -46,6 +49,7 @@ export default function DashboardClient({
 
   const [showScoreEntry, setShowScoreEntry] = useState(false)
   const [showSanction, setShowSanction] = useState(false)
+  const [showReward, setShowReward] = useState(false)
   const [showValidation, setShowValidation] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
   const [weekTypeLoading, setWeekTypeLoading] = useState(false)
@@ -97,7 +101,10 @@ export default function DashboardClient({
       const sanction = sanctions
         .filter(s => s.player_id === player.id)
         .reduce((sum, s) => sum + s.points, 0)
-      const total = base + daily + contrib + sanction
+      const reward = rewards
+        .filter(r => r.player_id === player.id)
+        .reduce((sum, r) => sum + r.points, 0)
+      const total = base + daily + contrib + sanction + reward
 
       return {
         player,
@@ -106,6 +113,7 @@ export default function DashboardClient({
         dailyPoints: daily,
         contributionPoints: contrib,
         sanctionPoints: sanction,
+        rewardPoints: reward,
         totalPoints: total,
         rank: 0,
         role: null,
@@ -117,7 +125,7 @@ export default function DashboardClient({
       ...row,
       rank: i + 1,
     }))
-  }, [players, activeWeek, dailyScores, contribMap, sanctions, baseScores])
+  }, [players, activeWeek, dailyScores, contribMap, sanctions, rewards, baseScores])
 
   // Merge with validated rankings if week is validated
   const displayRows: PlayerRow[] = useMemo(() => {
@@ -303,6 +311,9 @@ export default function DashboardClient({
                     <button data-tutorial="sanctions-btn" onClick={() => setShowSanction(true)} className="btn-secondary text-sm">
                       ⚠️ {t.sanctions}
                     </button>
+                    <button data-tutorial="rewards-btn" onClick={() => setShowReward(true)} className="btn-secondary text-sm">
+                      🎁 {t.rewards}
+                    </button>
                     <button data-tutorial="validate-btn" onClick={() => setShowValidation(true)} className="btn-primary text-sm">
                       ✅ {t.validateWeek}
                     </button>
@@ -375,6 +386,7 @@ export default function DashboardClient({
                     ))}
                     <th className="table-th-center">{t.contribPts}</th>
                     <th className="table-th-center">{t.sanctionPts}</th>
+                    <th className="table-th-center">{t.rewardPts}</th>
                     <th className="table-th-center" style={{ color: 'var(--gold)' }}>{t.total}</th>
                   </tr>
                 </thead>
@@ -420,6 +432,9 @@ export default function DashboardClient({
                         <td className={`px-2 py-3 text-center font-medium ${getScoreColor(row.sanctionPoints)}`}>
                           {row.sanctionPoints < 0 ? row.sanctionPoints : '—'}
                         </td>
+                        <td className={`px-2 py-3 text-center font-medium ${getScoreColor(row.rewardPoints)}`}>
+                          {row.rewardPoints > 0 ? `+${row.rewardPoints}` : '—'}
+                        </td>
                         <td className="px-4 py-3 text-center">
                           <span className={`text-lg font-bold ${row.rank === 1 ? 'rank-gold' : row.rank === 2 ? 'rank-silver' : row.rank === 3 ? 'rank-bronze' : 'text-white'}`}>
                             {row.totalPoints}
@@ -431,7 +446,7 @@ export default function DashboardClient({
 
                   {displayRows.length === 0 && activeWeek && (
                     <tr>
-                      <td colSpan={2 + weekDays.length + 3} className="px-4 py-12 text-center text-slate-500">
+                      <td colSpan={2 + weekDays.length + 4} className="px-4 py-12 text-center text-slate-500">
                         {t.loading}
                       </td>
                     </tr>
@@ -471,6 +486,17 @@ export default function DashboardClient({
           lang={lang}
           onClose={() => setShowSanction(false)}
           onSaved={() => { setShowSanction(false); router.refresh() }}
+        />
+      )}
+
+      {showReward && activeWeek && (
+        <RewardModal
+          players={players}
+          week={activeWeek}
+          existingRewards={rewards}
+          lang={lang}
+          onClose={() => setShowReward(false)}
+          onSaved={() => { setShowReward(false); router.refresh() }}
         />
       )}
 

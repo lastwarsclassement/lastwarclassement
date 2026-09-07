@@ -25,17 +25,20 @@ export default async function DashboardPage() {
 
   let dailyScores = null
   let sanctions = null
+  let rewards = null
   let baseScores = null
   let weekRankings = null
 
   if (activeWeek) {
-    const [ds, s, pwb] = await Promise.all([
+    const [ds, s, rw, pwb] = await Promise.all([
       db.from('daily_scores').select('*').eq('week_id', activeWeek.id),
       db.from('sanctions').select('*').eq('week_id', activeWeek.id),
+      db.from('rewards').select('*').eq('week_id', activeWeek.id),
       db.from('player_week_base').select('*').eq('week_id', activeWeek.id),
     ])
     dailyScores = ds.data
     sanctions = s.data
+    rewards = rw.data
     baseScores = pwb.data
 
     if (activeWeek.status === 'validated') {
@@ -56,6 +59,7 @@ export default async function DashboardPage() {
       activeWeek={activeWeek}
       dailyScores={dailyScores || []}
       sanctions={sanctions || []}
+      rewards={rewards || []}
       baseScores={baseScores || []}
       weekRankings={weekRankings || []}
     />

@@ -283,3 +283,26 @@ CREATE POLICY "Authenticated can read season_event_responses" ON season_event_re
 ALTER TABLE event_ds_signups DROP CONSTRAINT IF EXISTS event_ds_signups_check;
 ALTER TABLE event_ds_signups ADD CONSTRAINT event_ds_signups_check
   CHECK ((event_a_status != 'present' OR event_b_status = 'absent') AND (event_b_status != 'present' OR event_a_status = 'absent'));
+
+-- ============================================================
+-- MIGRATION : onglet "Récompenses" (à exécuter sur dev et prod)
+-- ============================================================
+
+CREATE TABLE rewards (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  week_id UUID NOT NULL REFERENCES weeks(id) ON DELETE CASCADE,
+  player_id UUID NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+  points INTEGER NOT NULL DEFAULT 5,
+  reason TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE rewards ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Authenticated can read rewards" ON rewards FOR SELECT TO authenticated USING (true);
+
+CREATE POLICY "Admins can insert rewards" ON rewards FOR INSERT TO authenticated
+  WITH CHECK (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin'));
+
+CREATE POLICY "Admins can delete rewards" ON rewards FOR DELETE TO authenticated
+  USING (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin'));

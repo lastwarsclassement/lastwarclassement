@@ -63,6 +63,15 @@ export interface Sanction {
   created_at: string
 }
 
+export interface Reward {
+  id: string
+  week_id: string
+  player_id: string
+  points: number
+  reason: string | null
+  created_at: string
+}
+
 export interface WeeklyRanking {
   id: string
   week_id: string

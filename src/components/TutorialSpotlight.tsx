@@ -105,6 +105,12 @@ const ADMIN_STEPS: Step[] = [
     bodyEn: 'This button opens the sanctions panel.\n\nChoose how many points to deduct, then check the players to penalize.\n\nMultiple sanctions stack in the same week. The existing count is shown next to each player, and each sanction can be canceled from this panel.',
   },
   {
+    icon: '🎁', chapter: 'week', page: '/dashboard', target: 'rewards-btn',
+    title: 'Attribuer des récompenses', titleEn: 'Grant Rewards',
+    body: 'Ce bouton ouvre le panneau de récompenses.\n\nChoisissez le nombre de points à ajouter, puis cochez les joueurs à récompenser.\n\nPlusieurs récompenses sont cumulables sur la même semaine. Le compteur existant s\'affiche à côté de chaque joueur, et chaque récompense peut être annulée depuis ce panneau.',
+    bodyEn: 'This button opens the rewards panel.\n\nChoose how many points to add, then check the players to reward.\n\nMultiple rewards stack in the same week. The existing count is shown next to each player, and each reward can be canceled from this panel.',
+  },
+  {
     icon: '✅', chapter: 'week', page: '/dashboard', target: 'validate-btn',
     title: 'Valider la semaine', titleEn: 'Validate the Week',
     body: 'Ce bouton clôture la semaine et fige le classement.\n\nL\'app attribue automatiquement, uniquement selon le classement :\n• **Top 7 → Pilotes** : base semaine suivante = **0**\n• **7 suivants → VIP** : conservent leurs points comme base\n• **Autres joueurs** → conservent leurs points comme base\n\nLes anniversaires n\'ont plus d\'effet sur les rôles (badge 🎂 informatif uniquement).\n\nVérifiez le récapitulatif puis confirmez.',
@@ -113,8 +119,8 @@ const ADMIN_STEPS: Step[] = [
   {
     icon: '🔓', chapter: 'week', page: '/dashboard', target: 'reopen-btn',
     title: 'Rouvrir après validation', titleEn: 'Reopen After Validation',
-    body: 'Ce bouton apparaît **après validation** si une correction est nécessaire.\n\nLa semaine repasse en mode actif. Corrigez scores ou sanctions, puis revalidez.\n\n⚠️ Les rôles Pilote/VIP sont effacés et recalculés à la prochaine validation.',
-    bodyEn: 'This button appears **after validation** if a correction is needed.\n\nThe week goes back to active. Fix scores or sanctions, then re-validate.\n\n⚠️ Pilot/VIP roles are cleared and recalculated at next validation.',
+    body: 'Ce bouton apparaît **après validation** si une correction est nécessaire.\n\nLa semaine repasse en mode actif. Corrigez scores, sanctions ou récompenses, puis revalidez.\n\n⚠️ Les rôles Pilote/VIP sont effacés et recalculés à la prochaine validation.',
+    bodyEn: 'This button appears **after validation** if a correction is needed.\n\nThe week goes back to active. Fix scores, sanctions, or rewards, then re-validate.\n\n⚠️ Pilot/VIP roles are cleared and recalculated at next validation.',
   },
   {
     icon: '📚', chapter: 'history', page: '/dashboard/history', target: 'history-dropdown',
@@ -158,8 +164,8 @@ const READER_STEPS: Step[] = [
   {
     icon: '📊', chapter: 'leaderboard', page: '/dashboard', target: 'leaderboard-table',
     title: 'Comprendre les colonnes', titleEn: 'Understanding the Columns',
-    body: 'Chaque colonne représente :\n\n• **Lun → Sam** : points gagnés ou perdus selon votre score VS du jour\n• **Dim.** : points de contribution d\'alliance du dimanche (classement automatique)\n• **Sanction** : malus appliqués par un admin (valeur libre, définie au cas par cas)\n• **Total** : cumul de tous vos points de la semaine en cours',
-    bodyEn: 'Each column represents:\n\n• **Mon → Sat**: points won or lost based on your VS score\n• **Sun.**: Sunday alliance contribution points (auto-ranked)\n• **Sanction**: penalties applied by an admin (custom value, set case by case)\n• **Total**: all your points accumulated for the current week',
+    body: 'Chaque colonne représente :\n\n• **Lun → Sam** : points gagnés ou perdus selon votre score VS du jour\n• **Dim.** : points de contribution d\'alliance du dimanche (classement automatique)\n• **Sanction** : malus appliqués par un admin (valeur libre, définie au cas par cas)\n• **Récompenses** : bonus appliqués par un admin (valeur libre, définie au cas par cas)\n• **Total** : cumul de tous vos points de la semaine en cours',
+    bodyEn: 'Each column represents:\n\n• **Mon → Sat**: points won or lost based on your VS score\n• **Sun.**: Sunday alliance contribution points (auto-ranked)\n• **Sanction**: penalties applied by an admin (custom value, set case by case)\n• **Rewards**: bonuses applied by an admin (custom value, set case by case)\n• **Total**: all your points accumulated for the current week',
   },
   {
     icon: '📚', chapter: 'history', page: '/dashboard/history', target: 'history-dropdown',
